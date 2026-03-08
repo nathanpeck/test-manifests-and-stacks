@@ -1,0 +1,14 @@
+services:
+  web:
+    image: nginx:alpine
+    container_name: app-one-nginx
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  cache:
+    image: redis:alpine
+    container_name: app-one-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
