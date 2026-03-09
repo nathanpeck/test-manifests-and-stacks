@@ -13,6 +13,7 @@ services:
       - "6379:6379"
     restart: unless-stopped
 
+  # Crashes on purpose
   crash:
     image: alpine:latest
     container_name: app-one-crash
