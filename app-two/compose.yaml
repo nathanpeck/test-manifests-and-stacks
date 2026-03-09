@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: example-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: supersecret
+      POSTGRES_DB: appdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  api:
+    image: nginx:1.25-alpine
+    container_name: example-api
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - '8081:80'
+  web:
+    image: httpd:2.4-alpine
+    container_name: example-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - '8080:80'
+    deploy:
+      replicas: 4
+volumes:
+  db-data: null
