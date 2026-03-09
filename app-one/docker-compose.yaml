@@ -16,5 +16,5 @@ services:
   crash:
     image: alpine:latest
     container_name: app-one-crash
-    command: ["sh", "-c", "sleep 30 && echo 'FATAL: Failed to connect to database' >&2 && echo 'ERROR: Connection timeout after 30s' >&2 && echo 'ERROR: Exiting with failure' >&2 && exit 1"]
+    command: ["sh", "-c", "echo 'Starting up...' && sleep 10 && echo 'FATAL: Failed to connect to database' >&2 && echo 'ERROR: Connection timeout after 10s' >&2 && echo 'ERROR: Exiting with failure' >&2 && exit 1"]
     restart: "no"
