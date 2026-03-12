@@ -1,0 +1,108 @@
+# app-three: minimal K8s stack (no build, pre-built images only)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: app-three
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-three
+      component: web
+  template:
+    metadata:
+      labels:
+        app: app-three
+        component: web
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    app: app-three
+spec:
+  selector:
+    app: app-three
+    component: web
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+  labels:
+    app: app-three
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-three
+      component: cache
+  template:
+    metadata:
+      labels:
+        app: app-three
+        component: cache
+    spec:
+      containers:
+        - name: redis
+          image: redis:alpine
+          ports:
+            - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache
+  labels:
+    app: app-three
+spec:
+  selector:
+    app: app-three
+    component: cache
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+# Crashes on purpose (runs once, no restart)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: crash
+  labels:
+    app: app-three
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: app-three
+        component: crash
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: crash
+          image: alpine:latest
+          command:
+            - sh
+            - -c
+            - |
+              echo 'Starting up...'
+              sleep 10
+              echo 'FATAL: Failed to connect to database' >&2
+              echo 'ERROR: Connection timeout after 10s' >&2
+              echo 'ERROR: Exiting with failure' >&2
+              exit 1
