@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cozy-game-data
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/raspberrypi2/default/cozy-game.yaml
+    portainer-run/vibe-source-path: portainer-run/raspberrypi2/default/cozy-game/src
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozy-game
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/raspberrypi2/default/cozy-game.yaml
+    portainer-run/vibe-source-path: portainer-run/raspberrypi2/default/cozy-game/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozy-game
+  template:
+    metadata:
+      labels:
+        app: cozy-game
+        managed-by: portainer-run
+    spec:
+      initContainers:
+        - name: vibe-sync
+          image: alpine/git:latest
+          command:
+            - sh
+            - '-c'
+            - >-
+              git config --global http.sslVerify false && git clone --depth 1 --branch main
+              https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks /tmp/repo && mkdir -p
+              /usr/share/nginx/html && cp -r /tmp/repo/portainer-run/raspberrypi2/default/cozy-game/src/.
+              /usr/share/nginx/html/ && rm -rf /tmp/repo
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-game-git-credentials
+                  key: username
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-game-git-credentials
+                  key: token
+      containers:
+        - name: cozy-game
+          image: nginx:alpine
+          command:
+            - sh
+            - '-c'
+            - nginx -g 'daemon off;'
+          workingDir: /usr/share/nginx/html
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: cozy-game-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozy-game
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/raspberrypi2/default/cozy-game.yaml
+    portainer-run/vibe-source-path: portainer-run/raspberrypi2/default/cozy-game/src
+spec:
+  type: NodePort
+  selector:
+    app: cozy-game
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
