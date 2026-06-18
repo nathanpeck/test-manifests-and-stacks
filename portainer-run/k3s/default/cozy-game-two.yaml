@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cozy-game-two-data
+  namespace: default
+  labels:
+    app: cozy-game-two
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/default/cozy-game-two.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/default/cozy-game-two/src
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozy-game-two
+  namespace: default
+  labels:
+    app: cozy-game-two
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/default/cozy-game-two.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/default/cozy-game-two/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozy-game-two
+  template:
+    metadata:
+      labels:
+        app: cozy-game-two
+        managed-by: portainer-run
+    spec:
+      initContainers:
+        - name: vibe-sync
+          image: alpine/git:latest
+          command:
+            - sh
+            - '-c'
+            - >-
+              git config --global http.sslVerify false && git clone --depth 1 --branch main
+              https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks /tmp/repo && mkdir -p
+              /usr/share/nginx/html && cp -r /tmp/repo/portainer-run/k3s/default/cozy-game-two/src/.
+              /usr/share/nginx/html/ && rm -rf /tmp/repo
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-game-two-git-credentials
+                  key: username
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-game-two-git-credentials
+                  key: token
+      containers:
+        - name: cozy-game-two
+          image: nginx:alpine
+          command:
+            - sh
+            - '-c'
+            - nginx -g 'daemon off;'
+          workingDir: /usr/share/nginx/html
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: cozy-game-two-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozy-game-two
+  namespace: default
+  labels:
+    app: cozy-game-two
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/default/cozy-game-two.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/default/cozy-game-two/src
+spec:
+  type: ClusterIP
+  selector:
+    app: cozy-game-two
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cozy-game-two
+  namespace: default
+  labels:
+    app: cozy-game-two
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: aea51d86-def3-46b8-a4f2-115e6573ecdb
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/default/cozy-game-two.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/default/cozy-game-two/src
+spec:
+  rules:
+    - host: cozy.nathanpeck.gg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cozy-game-two
+                port:
+                  number: 80
