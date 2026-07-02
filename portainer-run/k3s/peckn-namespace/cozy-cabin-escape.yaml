@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cozy-cabin-escape-data
+  namespace: peckn-namespace
+  labels:
+    app: cozy-cabin-escape
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 363bdfbe-ca28-4cc5-acd4-00a9339300a0
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/peckn-namespace/cozy-cabin-escape.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/peckn-namespace/cozy-cabin-escape/src
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozy-cabin-escape
+  namespace: peckn-namespace
+  labels:
+    app: cozy-cabin-escape
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 363bdfbe-ca28-4cc5-acd4-00a9339300a0
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/peckn-namespace/cozy-cabin-escape.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/peckn-namespace/cozy-cabin-escape/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozy-cabin-escape
+  template:
+    metadata:
+      labels:
+        app: cozy-cabin-escape
+        managed-by: portainer-run
+    spec:
+      initContainers:
+        - name: vibe-sync
+          image: alpine/git:latest
+          command:
+            - sh
+            - '-c'
+            - >-
+              git config --global http.sslVerify false && git clone --depth 1 --branch main
+              https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks /tmp/repo && mkdir -p
+              /usr/share/nginx/html && cp -r /tmp/repo/portainer-run/k3s/peckn-namespace/cozy-cabin-escape/src/.
+              /usr/share/nginx/html/ && rm -rf /tmp/repo
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-cabin-escape-git-credentials
+                  key: username
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-cabin-escape-git-credentials
+                  key: token
+      containers:
+        - name: cozy-cabin-escape
+          image: nginx:alpine
+          command:
+            - sh
+            - '-c'
+            - nginx -g 'daemon off;'
+          workingDir: /usr/share/nginx/html
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: cozy-cabin-escape-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozy-cabin-escape
+  namespace: peckn-namespace
+  labels:
+    app: cozy-cabin-escape
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 363bdfbe-ca28-4cc5-acd4-00a9339300a0
+    portainer-run/git-branch: main
+    portainer-run/git-path: portainer-run/k3s/peckn-namespace/cozy-cabin-escape.yaml
+    portainer-run/vibe-source-path: portainer-run/k3s/peckn-namespace/cozy-cabin-escape/src
+spec:
+  type: NodePort
+  selector:
+    app: cozy-cabin-escape
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
