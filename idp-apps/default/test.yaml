@@ -14,7 +14,7 @@ metadata:
     portainer-idp/edge-stack-id: '6'
     portainer-idp/edge-group-ids: 2,4,5
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: test
