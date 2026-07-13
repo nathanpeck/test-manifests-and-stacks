@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: default
+  labels:
+    app: test
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: idp-apps/default/test.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: 1,2,3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx
+          imagePullPolicy: Always
