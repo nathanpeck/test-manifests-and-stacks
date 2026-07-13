@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-wordpress-data
+  namespace: wordpress
+  labels:
+    app: wordpress-2
+    managed-by: portainer-idp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-mysql-data
+  namespace: wordpress
+  labels:
+    app: wordpress-2
+    managed-by: portainer-idp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-2
+  namespace: wordpress
+  labels:
+    app: wordpress-2
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: idc/wordpress/wordpress/wordpress-2.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '9'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress-2
+  template:
+    metadata:
+      labels:
+        app: wordpress-2
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: wordpress
+          image: wordpress:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: WORDPRESS_DB_HOST
+              value: localhost
+            - name: WORDPRESS_DB_USER
+              value: wpuser
+            - name: WORDPRESS_DB_PASSWORD
+              value: changeme
+            - name: WORDPRESS_DB_NAME
+              value: wordpress
+          volumeMounts:
+            - name: wordpress-wordpress-data
+              mountPath: /var/www/html
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: MYSQL_DATABASE
+              value: wordpress
+            - name: MYSQL_USER
+              value: wpuser
+            - name: MYSQL_PASSWORD
+              value: changeme
+            - name: MYSQL_RANDOM_ROOT_PASSWORD
+              value: '1'
+          volumeMounts:
+            - name: wordpress-mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: wordpress-wordpress-data
+          persistentVolumeClaim:
+            claimName: wordpress-wordpress-data
+        - name: wordpress-mysql-data
+          persistentVolumeClaim:
+            claimName: wordpress-mysql-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-2
+  namespace: wordpress
+  labels:
+    app: wordpress-2
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: wordpress-2
+  type: NodePort
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
