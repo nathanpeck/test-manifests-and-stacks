@@ -11,9 +11,9 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: idp-apps/default/test.yaml
     portainer-idp/edge-stack: 'true'
-    portainer-idp/edge-group-ids: 1,2,3
+    portainer-idp/edge-group-ids: 4,2
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: test
