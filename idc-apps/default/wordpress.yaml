@@ -41,6 +41,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: idc-apps/default/wordpress.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '11'
     portainer-idp/edge-group-ids: '8'
 spec:
   replicas: 1
