@@ -12,6 +12,7 @@ metadata:
     portainer-idp/git-path: idp-apps/default/test2.yaml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '8'
     portainer-idp/edge-group-ids: 2,5
 spec:
   replicas: 1
