@@ -1,0 +1,12 @@
+{
+  "name": "dockerhub-analytics",
+  "version": "1.0.0",
+  "description": "Docker Hub pull count analytics",
+  "main": "proxy/server.js",
+  "scripts": {
+    "start": "node proxy/server.js"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

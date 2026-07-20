@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dockerhub-analytics-data
+  namespace: default
+  labels:
+    app: dockerhub-analytics
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: badbcd1e-71b9-4b33-9051-1be2fc189772
+    portainer-run/git-branch: main
+    portainer-run/git-path: k3s/default/dockerhub-analytics.yaml
+    portainer-run/vibe-source-path: k3s/default/dockerhub-analytics/src
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockerhub-analytics
+  namespace: default
+  labels:
+    app: dockerhub-analytics
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: badbcd1e-71b9-4b33-9051-1be2fc189772
+    portainer-run/git-branch: main
+    portainer-run/git-path: k3s/default/dockerhub-analytics.yaml
+    portainer-run/vibe-source-path: k3s/default/dockerhub-analytics/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dockerhub-analytics
+  template:
+    metadata:
+      labels:
+        app: dockerhub-analytics
+        managed-by: portainer-run
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+      initContainers:
+        - name: vibe-sync
+          image: alpine/git:latest
+          command:
+            - sh
+            - '-c'
+            - >-
+              git config --global http.sslVerify false && git clone --depth 1 --branch main
+              https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks /tmp/repo && mkdir -p
+              /app && cp -r /tmp/repo/k3s/default/dockerhub-analytics/src/. /app/ && rm -rf /tmp/repo
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - name: app-data
+              mountPath: /app
+          env:
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: dockerhub-analytics-git-credentials
+                  key: username
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: dockerhub-analytics-git-credentials
+                  key: token
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+        - name: vibe-install
+          image: node:22
+          command:
+            - sh
+            - '-c'
+            - cd /app && if [ -f package.json ]; then npm install --production 2>&1; fi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: '1'
+              memory: 2Gi
+          volumeMounts:
+            - name: app-data
+              mountPath: /app
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      containers:
+        - name: dockerhub-analytics
+          image: node:22
+          command:
+            - sh
+            - '-c'
+            - npm start
+          workingDir: /app
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - name: app-data
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: '1'
+              memory: 4Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: dockerhub-analytics-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dockerhub-analytics
+  namespace: default
+  labels:
+    app: dockerhub-analytics
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: badbcd1e-71b9-4b33-9051-1be2fc189772
+    portainer-run/git-branch: main
+    portainer-run/git-path: k3s/default/dockerhub-analytics.yaml
+    portainer-run/vibe-source-path: k3s/default/dockerhub-analytics/src
+spec:
+  type: NodePort
+  selector:
+    app: dockerhub-analytics
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
