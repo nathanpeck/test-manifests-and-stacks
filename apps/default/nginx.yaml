@@ -11,7 +11,6 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: apps/default/nginx.yaml
     portainer-idp/edge-stack: 'true'
-    portainer-idp/edge-stack-id: '27'
     portainer-idp/edge-group-ids: '5'
 spec:
   replicas: 1
@@ -28,3 +27,40 @@ spec:
         - name: app
           image: nginx
           imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: default
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: nginx
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  namespace: default
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
