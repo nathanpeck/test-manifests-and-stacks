@@ -10,7 +10,9 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: idp-apps/default/nginx-test.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '2'
     portainer-idp/edge-group-ids: '5'
 spec:
   replicas: 3
@@ -27,3 +29,20 @@ spec:
         - name: app
           image: nginx
           imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-expose
+  namespace: default
+  labels:
+    app: nginx-test
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: nginx-test
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
