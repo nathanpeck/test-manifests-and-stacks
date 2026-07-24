@@ -41,8 +41,28 @@ metadata:
 spec:
   selector:
     app: nginx-test
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 80
       targetPort: 80
       protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-test
+  namespace: default
+  labels:
+    app: nginx-test
+    managed-by: portainer-idp
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-expose
+                port:
+                  number: 80
