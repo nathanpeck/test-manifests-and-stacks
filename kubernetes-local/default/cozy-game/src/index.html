@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One More Night — a tiny adventure</title>
+<style>
+  :root{
+    --wall:#bd8466; --wall-d:#a06f53; --floor:#5e4129; --floor-l:#6f4d33;
+    --cream:#f3e7d3; --teal:#3f7e7a; --moon:#f5e9c8; --sky:#283150;
+    --ink:#2c2018; --gold:#e0b15a; --glow:#ffe6a8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    background:radial-gradient(circle at 50% 30%,#23314a,#10151f 80%);
+    color:var(--cream); display:flex; align-items:center; justify-content:center;
+    min-height:100vh; padding:16px; overflow-x:hidden;
+  }
+  #app{ width:min(840px,100%); }
+  .frame{
+    background:#1b232f; border:2px solid #34425a; border-radius:14px;
+    box-shadow:0 18px 50px rgba(0,0,0,.55), inset 0 0 0 6px #232e3d;
+    overflow:hidden;
+  }
+
+  /* message bar */
+  #bar{
+    padding:12px 16px; font-size:15px; min-height:46px; line-height:1.35;
+    background:linear-gradient(#222d3c,#1a232f); border-bottom:1px solid #33425a;
+    display:flex; align-items:center; gap:10px;
+  }
+  #bar .dot{ width:8px;height:8px;border-radius:50%;background:var(--gold);flex:0 0 auto;
+    box-shadow:0 0 8px var(--gold); }
+  #bar span{ transition:opacity .2s; }
+
+  /* scene */
+  #scene{ display:block; width:100%; height:auto; background:#000; }
+  .hot{ cursor:pointer; }
+  .hot:hover .hl{ opacity:.9; }
+  .hl{ opacity:0; transition:opacity .15s; }
+  .gone{ display:none !important; }
+  .pickup{ animation:bob 1.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);} }
+
+  /* inventory */
+  #tray{
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:linear-gradient(#1a232f,#222d3c); border-top:1px solid #33425a;
+    min-height:64px;
+  }
+  #tray .lbl{ font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+    color:#8aa0bd; flex:0 0 auto; }
+  #slots{ display:flex; gap:8px; flex-wrap:wrap; }
+  .slot{
+    width:44px;height:44px;border-radius:10px; display:flex;align-items:center;justify-content:center;
+    font-size:24px; background:#2b3849; border:2px solid #3a4a60; cursor:pointer;
+    transition:transform .1s, box-shadow .15s, border-color .15s;
+  }
+  .slot:hover{ transform:translateY(-2px); }
+  .slot.sel{ border-color:var(--gold); box-shadow:0 0 0 2px var(--gold),0 0 16px var(--glow); }
+  #hint{ margin-left:auto; font-size:13px; color:var(--glow); min-height:18px; text-align:right; }
+
+  /* overlays */
+  .ov{ position:fixed; inset:0; background:rgba(8,11,18,.86); display:flex;
+    align-items:center; justify-content:center; padding:20px; z-index:20; }
+  .card{ background:#222d3c; border:2px solid #3a4a60; border-radius:16px;
+    padding:30px 34px; max-width:440px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+  .card h1{ margin:.1em 0 .3em; font-size:30px; color:var(--gold); letter-spacing:.02em; }
+  .card h2{ margin:.1em 0 .4em; font-size:26px; color:var(--gold); }
+  .card p{ color:#cdd8e8; line-height:1.5; margin:.5em 0 1.2em; }
+  .btn{ font-family:inherit; font-size:16px; cursor:pointer; border:none; border-radius:10px;
+    padding:11px 26px; background:var(--gold); color:#33240c; font-weight:bold;
+    box-shadow:0 4px 0 #a87f2c; transition:transform .08s, box-shadow .08s; }
+  .btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #a87f2c; }
+  .small{ font-size:13px; color:#8aa0bd; margin-top:14px; }
+
+  /* keypad */
+  #pad .keys{ display:grid; grid-template-columns:repeat(3,64px); gap:10px; justify-content:center; margin:14px 0; }
+  #pad button.k{ font-family:inherit; height:54px; font-size:22px; border-radius:10px; cursor:pointer;
+    background:#33425a; color:var(--cream); border:1px solid #46597a; transition:background .1s; }
+  #pad button.k:hover{ background:#3e5070; }
+  #pad button.act{ background:var(--teal); color:#06201f; border:none; }
+  #disp{ font-size:30px; letter-spacing:.4em; background:#11161f; border:1px solid #46597a;
+    border-radius:8px; padding:10px; min-height:30px; color:var(--glow); }
+  .x{ position:absolute; top:14px; right:18px; cursor:pointer; color:#8aa0bd; font-size:22px; }
+  .relative{ position:relative; }
+  .note{ white-space:pre-line; font-style:italic; color:#f0e4ce;
+    background:#1a2230; border:1px dashed #5a6c8a; border-radius:10px; padding:18px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="frame">
+    <div id="bar"><span class="dot"></span><span id="msg">A small cabin. One door. It's locked, naturally.</span></div>
+
+    <svg id="scene" viewBox="0 0 840 520" xmlns="http://www.w3.org/2000/svg" aria-label="cabin room">
+      <!-- WALL & FLOOR -->
+      <rect x="0" y="0" width="840" height="372" fill="var(--wall)"/>
+      <rect x="0" y="0" width="840" height="372" fill="url(#wallGrad)"/>
+      <rect x="0" y="358" width="840" height="14" fill="var(--wall-d)"/>
+      <rect x="0" y="372" width="840" height="148" fill="var(--floor)"/>
+      <g stroke="#4a3322" stroke-width="2" opacity=".6">
+        <line x1="0" y1="410" x2="840" y2="410"/><line x1="0" y1="455" x2="840" y2="455"/>
+        <line x1="150" y1="372" x2="150" y2="520"/><line x1="420" y1="372" x2="420" y2="520"/>
+        <line x1="690" y1="372" x2="690" y2="520"/>
+      </g>
+
+      <!-- WINDOW (flavor) -->
+      <g id="window" class="hot">
+        <rect class="hl" x="48" y="44" width="170" height="150" rx="6" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="52" y="48" width="162" height="142" rx="4" fill="var(--sky)"/>
+        <path d="M150 70 a34 34 0 1 0 22 60 a44 44 0 1 1 -22 -60 z" fill="var(--moon)"/>
+        <circle cx="80" cy="86" r="2.4" fill="#fff"/><circle cx="100" cy="120" r="1.8" fill="#fff"/>
+        <circle cx="78" cy="150" r="2" fill="#fff"/><circle cx="186" cy="148" r="2.2" fill="#fff"/>
+        <rect x="44" y="40" width="178" height="158" rx="8" fill="none" stroke="#7a5237" stroke-width="9"/>
+        <line x1="133" y1="48" x2="133" y2="190" stroke="#7a5237" stroke-width="7"/>
+        <line x1="52" y1="119" x2="214" y2="119" stroke="#7a5237" stroke-width="7"/>
+      </g>
+
+      <!-- SAFE (hidden behind painting) -->
+      <g id="safe" class="hot gone">
+        <rect class="hl" x="364" y="58" width="116" height="116" rx="8" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="368" y="62" width="108" height="108" rx="6" fill="#3a3f47" stroke="#23262b" stroke-width="4"/>
+        <rect x="380" y="74" width="84" height="84" rx="4" fill="#2c3037" stroke="#1c1f24" stroke-width="3"/>
+        <circle cx="422" cy="116" r="20" fill="#52575f" stroke="#1c1f24" stroke-width="3"/>
+        <circle cx="422" cy="116" r="6" fill="#23262b"/>
+        <line x1="422" y1="116" x2="422" y2="100" stroke="#cbd0d8" stroke-width="3"/>
+        <text id="safeTxt" x="422" y="190" text-anchor="middle" font-size="13" fill="var(--glow)" font-family="serif">[ locked ]</text>
+      </g>
+
+      <!-- PAINTING (covers safe) -->
+      <g id="painting" class="hot">
+        <rect class="hl" x="354" y="48" width="136" height="138" rx="6" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="360" y="54" width="124" height="126" rx="3" fill="#3a2d20" stroke="var(--gold)" stroke-width="6"/>
+        <rect x="372" y="66" width="100" height="102" fill="#6f93a8"/>
+        <rect x="372" y="120" width="100" height="48" fill="#4f7559"/>
+        <path d="M372 120 l30 -26 l24 18 l26 -30 l20 24 v14 z" fill="#3c5e46"/>
+        <circle cx="452" cy="84" r="11" fill="#f6e7bf"/>
+      </g>
+
+      <!-- CLOCK -->
+      <g id="clock" class="hot">
+        <rect class="hl" x="616" y="44" width="124" height="124" rx="62" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <circle cx="678" cy="106" r="58" fill="#2a2118" stroke="var(--gold)" stroke-width="6"/>
+        <circle cx="678" cy="106" r="48" fill="#f3e7d3"/>
+        <g stroke="#2c2018" stroke-width="2">
+          <line x1="678" y1="62" x2="678" y2="70"/><line x1="722" y1="106" x2="714" y2="106"/>
+          <line x1="678" y1="150" x2="678" y2="142"/><line x1="634" y1="106" x2="642" y2="106"/>
+        </g>
+        <!-- hands frozen at 7:25 -->
+        <line x1="678" y1="106" x2="655" y2="120" stroke="#2c2018" stroke-width="4" stroke-linecap="round"/>
+        <line x1="678" y1="106" x2="700" y2="128" stroke="#2c2018" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="678" cy="106" r="4" fill="var(--gold)"/>
+      </g>
+
+      <!-- PLANT (flavor) -->
+      <g id="plant" class="hot">
+        <rect class="hl" x="40" y="300" width="78" height="92" rx="8" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <path d="M62 318 q-14 -34 -2 -56 q10 18 6 56z" fill="#3f7e5a"/>
+        <path d="M80 318 q4 -40 22 -52 q-2 24 -14 52z" fill="#4f9168"/>
+        <path d="M72 318 q-2 -30 6 -48 q8 20 4 48z" fill="#458a60"/>
+        <path d="M52 320 h56 l-8 64 h-40z" fill="#a4623c"/>
+        <path d="M52 320 h56 l-2 14 h-52z" fill="#bb7146"/>
+      </g>
+
+      <!-- DRESSER + DRAWER -->
+      <g id="drawer" class="hot">
+        <rect class="hl" x="158" y="296" width="172" height="118" rx="8" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="162" y="300" width="164" height="110" rx="6" fill="#7a5232" stroke="#4a3120" stroke-width="3"/>
+        <rect x="172" y="310" width="144" height="40" rx="4" fill="#8a5e3a" stroke="#4a3120" stroke-width="2"/>
+        <rect x="172" y="358" width="144" height="42" rx="4" fill="#8a5e3a" stroke="#4a3120" stroke-width="2"/>
+        <circle cx="244" cy="330" r="6" fill="var(--gold)"/><circle cx="244" cy="379" r="6" fill="var(--gold)"/>
+        <!-- open state -->
+        <g id="drawerOpen" class="gone">
+          <rect x="172" y="358" width="144" height="42" rx="4" fill="#1e140c" stroke="#4a3120" stroke-width="2"/>
+          <rect x="180" y="356" width="128" height="10" fill="#8a5e3a"/>
+        </g>
+      </g>
+
+      <!-- VENT -->
+      <g id="vent" class="hot">
+        <rect class="hl" x="556" y="298" width="92" height="68" rx="6" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="560" y="302" width="84" height="60" rx="4" fill="#9c7152" stroke="#5d3f29" stroke-width="3"/>
+        <g id="ventSlats" stroke="#5d3f29" stroke-width="4">
+          <line x1="568" y1="314" x2="636" y2="314"/><line x1="568" y1="326" x2="636" y2="326"/>
+          <line x1="568" y1="338" x2="636" y2="338"/><line x1="568" y1="350" x2="636" y2="350"/>
+        </g>
+        <circle cx="566" cy="306" r="2.5" fill="#3a2615"/><circle cx="638" cy="306" r="2.5" fill="#3a2615"/>
+        <circle cx="566" cy="358" r="2.5" fill="#3a2615"/><circle cx="638" cy="358" r="2.5" fill="#3a2615"/>
+        <g id="ventOpenDark" class="gone"><rect x="566" y="308" width="72" height="48" rx="3" fill="#120c07"/></g>
+      </g>
+
+      <!-- DOOR -->
+      <g id="door" class="hot">
+        <rect class="hl" x="700" y="190" width="124" height="320" rx="8" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="704" y="196" width="116" height="324" rx="6" fill="#6a4628" stroke="#3f2916" stroke-width="5"/>
+        <rect x="718" y="212" width="88" height="120" rx="4" fill="#7c5430" stroke="#3f2916" stroke-width="3"/>
+        <rect x="718" y="344" width="88" height="150" rx="4" fill="#7c5430" stroke="#3f2916" stroke-width="3"/>
+        <circle cx="730" cy="360" r="7" fill="var(--gold)"/>
+        <g id="doorOpenGlow" class="gone"><rect x="704" y="196" width="116" height="324" rx="6" fill="url(#nightOut)" opacity=".0"/></g>
+      </g>
+
+      <!-- RUG -->
+      <g id="rug" class="hot">
+        <rect class="hl" x="312" y="424" width="280" height="78" rx="38" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <ellipse cx="452" cy="462" rx="138" ry="38" fill="var(--teal)" stroke="#2a5a57" stroke-width="4"/>
+        <ellipse cx="452" cy="462" rx="104" ry="26" fill="none" stroke="#d8a85a" stroke-width="3"/>
+        <ellipse cx="452" cy="462" rx="60" ry="14" fill="#c25b4a"/>
+      </g>
+      <g id="rugFlipped" class="gone">
+        <path d="M314 462 q138 -40 276 0 l-26 22 q-112 -26 -224 0 z" fill="#2a5a57"/>
+        <ellipse cx="452" cy="470" rx="120" ry="22" fill="#4a3322" opacity=".5"/>
+      </g>
+
+      <!-- PICKUP ITEMS in-scene -->
+      <g id="screwdriverItem" class="hot pickup gone">
+        <rect class="hl" x="404" y="448" width="96" height="30" rx="6" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="410" y="456" width="44" height="9" rx="4" fill="#b8c2cf" transform="rotate(-8 432 460)"/>
+        <rect x="448" y="452" width="34" height="16" rx="6" fill="#c2452f" transform="rotate(-8 465 460)"/>
+      </g>
+      <g id="smallkeyItem" class="hot pickup gone">
+        <rect class="hl" x="586" y="318" width="34" height="34" rx="6" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <circle cx="596" cy="330" r="7" fill="none" stroke="var(--gold)" stroke-width="4"/>
+        <rect x="600" y="328" width="20" height="4" fill="var(--gold)"/>
+        <rect x="615" y="328" width="4" height="9" fill="var(--gold)"/>
+      </g>
+      <g id="noteItem" class="hot pickup gone">
+        <rect class="hl" x="240" y="364" width="34" height="30" rx="4" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <rect x="246" y="368" width="22" height="26" rx="2" fill="#f3e7d3" transform="rotate(6 257 381)"/>
+        <g stroke="#9a8a6a" stroke-width="1.6"><line x1="249" y1="374" x2="266" y2="376"/><line x1="248" y1="380" x2="265" y2="382"/></g>
+      </g>
+      <g id="doorkeyItem" class="hot pickup gone">
+        <rect class="hl" x="402" y="100" width="42" height="36" rx="6" fill="none" stroke="var(--glow)" stroke-width="4"/>
+        <circle cx="412" cy="116" r="9" fill="none" stroke="var(--gold)" stroke-width="5"/>
+        <rect x="419" y="113" width="24" height="6" fill="var(--gold)"/>
+        <rect x="437" y="113" width="5" height="12" fill="var(--gold)"/><rect x="430" y="113" width="5" height="9" fill="var(--gold)"/>
+      </g>
+
+      <defs>
+        <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".4" stop-color="#000" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="nightOut" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a2a4a"/><stop offset="1" stop-color="#0a1120"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div id="tray">
+      <span class="lbl">Pockets</span>
+      <div id="slots"></div>
+      <div id="hint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TITLE -->
+<div class="ov" id="title">
+  <div class="card">
+    <h1>One More Night</h1>
+    <p>You only wanted to get to bed. Instead you're locked in a cabin with a stuck door, a crooked painting, and a clock that gave up long ago.<br><br>Click things to look. Tap an item in your pockets to pick it up, then click where to use it.</p>
+    <button class="btn" id="startBtn">Try the door anyway →</button>
+    <div class="small">A tiny point-and-click adventure</div>
+  </div>
+</div>
+
+<!-- NOTE READER -->
+<div class="ov gone" id="noteOv">
+  <div class="card relative">
+    <span class="x" id="noteClose">✕</span>
+    <h2>A scrap of paper</h2>
+    <div class="note">"I keep forgetting the safe code,
+so I'll write it where I'll never lose it:
+
+it's the time the old clock stopped."</div>
+    <div class="small">(Tap the note in your pockets to read it again.)</div>
+  </div>
+</div>
+
+<!-- KEYPAD -->
+<div class="ov gone" id="pad">
+  <div class="card relative">
+    <span class="x" id="padClose">✕</span>
+    <h2>Wall Safe</h2>
+    <p style="margin:.2em 0 0">Three digits.</p>
+    <div id="disp"></div>
+    <div class="keys">
+      <button class="k">1</button><button class="k">2</button><button class="k">3</button>
+      <button class="k">4</button><button class="k">5</button><button class="k">6</button>
+      <button class="k">7</button><button class="k">8</button><button class="k">9</button>
+      <button class="k act" id="clr">C</button><button class="k">0</button><button class="k act" id="ent">↵</button>
+    </div>
+  </div>
+</div>
+
+<!-- WIN -->
+<div class="ov gone" id="win">
+  <div class="card">
+    <h1>🌙</h1>
+    <h2>The door swings open</h2>
+    <p>Cool night air, a sky full of stars, and the long grass whispering. You step outside and finally, finally head to bed.<br><br><b>You escaped — well done.</b></p>
+    <button class="btn" id="again">Play again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ITEMS = {
+    screwdriver:{icon:"🪛", name:"a screwdriver"},
+    smallkey:{icon:"🔑", name:"a small brass key"},
+    note:{icon:"📜", name:"a scrap of paper"},
+    doorkey:{icon:"🗝️", name:"a heavy iron key"}
+  };
+  const S = { inv:[], sel:null, f:{} };
+
+  const $ = id => document.getElementById(id);
+  const msgEl = $("msg");
+  let msgTimer;
+  function msg(t, sticky){
+    msgEl.style.opacity=0;
+    setTimeout(()=>{ msgEl.textContent=t; msgEl.style.opacity=1; },120);
+  }
+  function show(id){ $(id).classList.remove("gone"); }
+  function hide(id){ $(id).classList.add("gone"); }
+
+  // ---- audio (tiny, optional) ----
+  let ac;
+  function blip(freq){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.frequency.value=freq; o.type="sine";
+      g.gain.setValueAtTime(.0001,ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.18,ac.currentTime+.01);
+      g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.18);
+      o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime+.2);
+    }catch(e){}
+  }
+
+  // ---- inventory ----
+  function addItem(id){
+    if(S.inv.includes(id)) return;
+    S.inv.push(id); renderInv(); blip(660);
+  }
+  function renderInv(){
+    const slots = $("slots"); slots.innerHTML="";
+    S.inv.forEach(id=>{
+      const d=document.createElement("div");
+      d.className="slot"+(S.sel===id?" sel":"");
+      d.textContent=ITEMS[id].icon; d.title=ITEMS[id].name;
+      d.onclick=()=>selectItem(id);
+      slots.appendChild(d);
+    });
+    if(S.inv.length===0){
+      const e=document.createElement("div");
+      e.style.cssText="font-size:13px;color:#6c819c;font-style:italic;";
+      e.textContent="(empty)"; slots.appendChild(e);
+    }
+    updateHint();
+  }
+  function selectItem(id){
+    S.sel = (S.sel===id)?null:id;
+    if(S.sel) blip(520);
+    renderInv();
+  }
+  function updateHint(){
+    $("hint").textContent = S.sel
+      ? "Using "+ITEMS[S.sel].icon+" — click where, or tap it again to put away"
+      : "";
+  }
+
+  // ---- core interaction ----
+  function used(target){ const u = S.sel===target; if(u) S.sel=null; renderInv(); return u; }
+
+  function on(id, fn){ $(id).addEventListener("click", e=>{ e.stopPropagation(); fn(); }); }
+
+  on("window", ()=> msg("A crescent moon over a still, dark sea. It would be a lovely night to actually sleep."));
+  on("plant",  ()=> msg("A little fern, thirsty and unbothered by your predicament."));
+
+  on("clock", ()=>{
+    msg("An old wall clock, long since stopped — its hands frozen at 7:25.");
+    blip(440);
+  });
+
+  on("rug", ()=>{
+    if(S.f.rug){ msg("Just bare, dusty floorboards under here now."); return; }
+    S.f.rug=true; hide("rug"); show("rugFlipped"); show("screwdriverItem");
+    msg("You flip the rug back. Something was hidden underneath — a screwdriver!");
+    blip(520);
+  });
+  on("screwdriverItem", ()=>{ addItem("screwdriver"); hide("screwdriverItem"); msg("You pocket the screwdriver."); });
+
+  on("vent", ()=>{
+    if(S.f.vent){ msg("The vent cover hangs open. Nothing left inside."); return; }
+    if(used("screwdriver")){
+      S.f.vent=true; hide("ventSlats"); show("ventOpenDark"); show("smallkeyItem");
+      msg("You undo the four screws and lift the vent cover. There's a little key tucked inside!");
+      blip(587);
+    } else {
+      msg("A wall vent, screwed shut at all four corners. I'd need a tool to open it.");
+    }
+  });
+  on("smallkeyItem", ()=>{ addItem("smallkey"); hide("smallkeyItem"); msg("A small brass key — too small for the front door."); });
+
+  on("drawer", ()=>{
+    if(S.f.drawer){ msg("The drawer hangs open and empty."); return; }
+    if(used("smallkey")){
+      S.f.drawer=true; show("drawerOpen"); show("noteItem");
+      msg("The little key fits the bottom drawer. It slides open — there's a folded note inside.");
+      blip(587);
+    } else {
+      msg("The bottom drawer is locked. There's a tiny keyhole.");
+    }
+  });
+  on("noteItem", ()=>{ addItem("note"); hide("noteItem"); show("noteOv"); });
+
+  on("painting", ()=>{
+    if(S.f.painting){ msg("The painting hangs aside, exposing the wall safe."); return; }
+    S.f.painting=true;
+    const p=$("painting");
+    p.style.transition="transform .4s ease";
+    p.style.transform="translate(-150px,8px) rotate(-6deg)";
+    show("safe");
+    msg("You swing the crooked painting aside — and there's a wall safe behind it!");
+    blip(494);
+  });
+
+  on("safe", ()=>{
+    if(S.f.safe){ msg("The safe stands open, empty now."); return; }
+    show("pad"); $("disp").textContent="";
+  });
+  on("doorkeyItem", ()=>{ addItem("doorkey"); hide("doorkeyItem"); msg("A heavy iron key. This one means business."); });
+
+  on("door", ()=>{
+    if(S.f.door){ winGame(); return; }
+    if(used("doorkey")){
+      S.f.door=true;
+      const g=$("doorOpenGlow"); g.classList.remove("gone");
+      g.querySelector("rect").style.transition="opacity .5s"; g.querySelector("rect").style.opacity=".9";
+      msg("The iron key turns with a deep, satisfying clunk...");
+      blip(659); setTimeout(winGame, 800);
+    } else {
+      msg("The front door. Locked tight. Of course it is.");
+    }
+  });
+
+  // clicking empty scene clears selection
+  $("scene").addEventListener("click", ()=>{ if(S.sel){ S.sel=null; renderInv(); } });
+
+  // ---- note overlay ----
+  $("noteClose").onclick=()=>hide("noteOv");
+  // re-read note via inventory handled in renderInv? add: clicking note slot shows reader
+  // override selectItem for note:
+  const _sel = selectItem;
+  // intercept: if note tapped, open reader instead of selecting
+  document.getElementById("slots").addEventListener("click",()=>{},false);
+
+  // ---- keypad ----
+  let code="";
+  $("pad").querySelectorAll(".k").forEach(b=>{
+    if(b.id) return;
+    b.onclick=()=>{ if(code.length<3){ code+=b.textContent; $("disp").textContent=code; blip(700);} };
+  });
+  $("clr").onclick=()=>{ code=""; $("disp").textContent=""; };
+  $("ent").onclick=()=>{
+    if(code==="725"){
+      S.f.safe=true; hide("pad"); show("doorkeyItem");
+      $("safeTxt").textContent="[ open ]";
+      msg("Click — the dial spins free and the safe pops open. A heavy iron key inside!");
+      blip(784);
+    } else {
+      msg("The safe buzzes and stays shut. Wrong code. (What time did the clock stop?)");
+      code=""; $("disp").textContent=""; blip(220);
+    }
+  };
+  $("padClose").onclick=()=>{ hide("pad"); code=""; };
+
+  // ---- title / win ----
+  function start(){ hide("title"); blip(523); msg("A small cabin, one locked door, and a long night ahead. Have a look around."); }
+  $("startBtn").onclick=start;
+  function winGame(){ show("win"); }
+  $("again").onclick=()=>location.reload();
+
+  // make note slot re-open reader
+  // patch renderInv click for note:
+  const origRender = renderInv;
+  // (selectItem already toggles; for note we also pop the reader)
+  // simplest: extend selectItem
+  window.__noteHook = true;
+
+  renderInv();
+})();
+// note re-read: open reader whenever the note is the one tapped
+document.addEventListener("click",function(e){
+  const slot=e.target.closest(".slot");
+  if(slot && slot.title==="a scrap of paper"){
+    document.getElementById("noteOv").classList.remove("gone");
+  }
+});
+</script>
+</body>
+</html>
