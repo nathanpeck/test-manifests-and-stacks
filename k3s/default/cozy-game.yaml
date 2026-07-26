@@ -135,10 +135,39 @@ metadata:
     portainer-run/git-path: k3s/default/cozy-game.yaml
     portainer-run/vibe-source-path: k3s/default/cozy-game/src
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: cozy-game
   ports:
     - port: 8080
       targetPort: 8080
       protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cozy-game
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: badbcd1e-71b9-4b33-9051-1be2fc189772
+    portainer-run/git-branch: main
+    portainer-run/git-path: k3s/default/cozy-game.yaml
+    portainer-run/vibe-source-path: k3s/default/cozy-game/src
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: cozy.nathanpeck.gg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cozy-game
+                port:
+                  number: 8080
