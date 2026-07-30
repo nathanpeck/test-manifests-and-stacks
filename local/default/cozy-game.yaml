@@ -8,7 +8,7 @@ metadata:
     managed-by: portainer-run
   annotations:
     portainer-run/deploy-type: vibe
-    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
     portainer-run/git-branch: main
     portainer-run/git-path: local/default/cozy-game.yaml
     portainer-run/vibe-source-path: local/default/cozy-game/src
@@ -29,7 +29,7 @@ metadata:
     managed-by: portainer-run
   annotations:
     portainer-run/deploy-type: vibe
-    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
     portainer-run/git-branch: main
     portainer-run/git-path: local/default/cozy-game.yaml
     portainer-run/vibe-source-path: local/default/cozy-game/src
@@ -130,7 +130,7 @@ metadata:
     managed-by: portainer-run
   annotations:
     portainer-run/deploy-type: vibe
-    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
     portainer-run/git-branch: main
     portainer-run/git-path: local/default/cozy-game.yaml
     portainer-run/vibe-source-path: local/default/cozy-game/src
