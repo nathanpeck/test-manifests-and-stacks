@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cozy-game-data
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/cozy-game.yaml
+    portainer-run/vibe-source-path: local/default/cozy-game/src
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cozy-game
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/cozy-game.yaml
+    portainer-run/vibe-source-path: local/default/cozy-game/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cozy-game
+  template:
+    metadata:
+      labels:
+        app: cozy-game
+        managed-by: portainer-run
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+      initContainers:
+        - name: vibe-sync
+          image: alpine/git:latest
+          command:
+            - sh
+            - '-c'
+            - >-
+              git config --global http.sslVerify false && git clone --depth 1 --branch main
+              https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks /tmp/repo && mkdir -p
+              /usr/share/nginx/html && cp -r /tmp/repo/local/default/cozy-game/src/. /usr/share/nginx/html/ && rm -rf
+              /tmp/repo
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-game-git-credentials
+                  key: username
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cozy-game-git-credentials
+                  key: token
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      containers:
+        - name: cozy-game
+          image: nginxinc/nginx-unprivileged:alpine
+          command:
+            - sh
+            - '-c'
+            - nginx -g 'daemon off;'
+          workingDir: /usr/share/nginx/html
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: '1'
+              memory: 4Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: cozy-game-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cozy-game
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/cozy-game.yaml
+    portainer-run/vibe-source-path: local/default/cozy-game/src
+spec:
+  type: ClusterIP
+  selector:
+    app: cozy-game
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cozy-game
+  namespace: default
+  labels:
+    app: cozy-game
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: fbdb6034-ff86-4cd5-ad67-27bb58a2fb0d
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/cozy-game.yaml
+    portainer-run/vibe-source-path: local/default/cozy-game/src
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: cozy.nathanpeck.gg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cozy-game
+                port:
+                  number: 8080
