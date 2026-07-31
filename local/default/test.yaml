@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-data
+  namespace: default
+  labels:
+    app: test
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/test.yaml
+    portainer-run/vibe-source-path: local/default/test/src
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: default
+  labels:
+    app: test
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/test.yaml
+    portainer-run/vibe-source-path: local/default/test/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+        managed-by: portainer-run
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
+      initContainers:
+        - name: vibe-sync
+          image: alpine/git:latest
+          command:
+            - sh
+            - '-c'
+            - >-
+              git config --global http.sslVerify false && git clone --depth 1 --branch main
+              https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks /tmp/repo && mkdir -p
+              /usr/share/nginx/html && cp -r /tmp/repo/local/default/test/src/. /usr/share/nginx/html/ && rm -rf
+              /tmp/repo
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          env:
+            - name: GIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: test-git-credentials
+                  key: username
+            - name: GIT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: test-git-credentials
+                  key: token
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      containers:
+        - name: test
+          image: nginxinc/nginx-unprivileged:alpine
+          command:
+            - sh
+            - '-c'
+            - nginx -g 'daemon off;'
+          workingDir: /usr/share/nginx/html
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: app-data
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: '1'
+              memory: 4Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: test-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: test
+  namespace: default
+  labels:
+    app: test
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/test.yaml
+    portainer-run/vibe-source-path: local/default/test/src
+spec:
+  type: ClusterIP
+  selector:
+    app: test
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test
+  namespace: default
+  labels:
+    app: test
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/test.yaml
+    portainer-run/vibe-source-path: local/default/test/src
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: test.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: test
+                port:
+                  number: 8080
