@@ -14,7 +14,7 @@ metadata:
     portainer-idp/edge-stack-id: '1'
     portainer-idp/edge-group-ids: '1'
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: nginx
