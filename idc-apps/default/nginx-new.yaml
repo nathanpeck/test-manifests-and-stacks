@@ -11,6 +11,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: idc-apps/default/nginx-new.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '7'
     portainer-idp/edge-group-ids: '1'
 spec:
   replicas: 1
