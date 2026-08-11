@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peckn-admin-app
+  namespace: default
+  labels:
+    app: peckn-admin-app
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: default/peckn-admin-app.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '1'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peckn-admin-app
+  template:
+    metadata:
+      labels:
+        app: peckn-admin-app
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx
+          imagePullPolicy: Always
