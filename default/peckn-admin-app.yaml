@@ -26,5 +26,5 @@ spec:
     spec:
       containers:
         - name: app
-          image: nginx
+          image: nginx:1.27-alpine
           imagePullPolicy: Always
