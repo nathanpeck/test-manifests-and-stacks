@@ -1,0 +1,22 @@
+# Values for the Kyverno chart vendored in command/kubesolo/charts/kyverno.
+#
+# Layered over the chart's own values.yaml, so this only carries what differs
+# from upstream. Edit this file rather than the chart directory: adopting a
+# newer chart version replaces that directory wholesale.
+#
+# This cluster is a single arm64 node (raspberrypi2, 4 CPU / 8GB), so one
+# replica of each controller. The chart's pod anti-affinity is
+# preferredDuringScheduling rather than required, so it does not need
+# disabling to schedule on one node.
+
+admissionController:
+  replicas: 1
+
+backgroundController:
+  replicas: 1
+
+cleanupController:
+  replicas: 1
+
+reportsController:
+  replicas: 1
