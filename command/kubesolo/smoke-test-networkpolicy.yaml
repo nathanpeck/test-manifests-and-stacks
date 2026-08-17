@@ -1,0 +1,67 @@
+# Default-deny for the namespace, then the two flows the smoke test actually needs.
+#
+# NOTE: enforcement is unverified on this cluster. The NetworkPolicy type is
+# registered, but that does not prove the CNI honours it. After deploying, check
+# from the pod that redis-stack.redis.svc:6379 is unreachable. If it is still
+# reachable, these objects are inert and should be treated as such.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: smoke-test
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: smoke-test-allow-dns-egress
+  namespace: smoke-test
+spec:
+  podSelector:
+    matchLabels:
+      app: smoke-test
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: smoke-test-allow-http-ingress
+  namespace: smoke-test
+spec:
+  podSelector:
+    matchLabels:
+      app: smoke-test
+  policyTypes:
+    - Ingress
+  ingress:
+    # Port 8080 from anywhere in the cluster. Narrow this to a specific
+    # namespaceSelector or podSelector once the caller is known.
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8080
+    # kubelet health probes originate from the node, not from a pod, and some
+    # CNIs will drop them under a default-deny ingress. Without this the pod can
+    # go unready and look like a failing smoke test rather than a policy problem.
+    - from:
+        - ipBlock:
+            cidr: 192.168.68.114/32
+      ports:
+        - protocol: TCP
+          port: 8080
