@@ -1,0 +1,105 @@
+# A workload for the ui-test namespace's policies to judge.
+#
+# The namespace enforces restricted Pod Security Admission and an enforcing
+# Kyverno policy (ui-test-policy.yaml). This manifest is written to pass both,
+# which between them require:
+#
+#   - non-root, no privilege escalation, all capabilities dropped, a seccomp
+#     profile and a read-only root filesystem  (PSA restricted)
+#   - CPU and memory on requests AND limits for every container  (Kyverno)
+#   - an explicit image tag that is not "latest"  (Kyverno)
+#
+# Drop any one of those and admission refuses the pod, so the deploy fails
+# rather than the pod starting and crash-looping.
+#
+# Shape follows smoke-test.yaml: nginx-unprivileged serves on 8080 as uid 101,
+# with emptyDir mounts for the two paths nginx writes to under a read-only root.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ui-test-web
+  namespace: ui-test
+# It serves a static page; it has no reason to hold a credential for the API server.
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-test-web
+  namespace: ui-test
+  labels:
+    app: ui-test-web
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: ui-test-web
+  template:
+    metadata:
+      labels:
+        app: ui-test-web
+    spec:
+      serviceAccountName: ui-test-web
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: nginx
+          image: nginxinc/nginx-unprivileged:1.27-alpine
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          # Required by the Kyverno policy, on both halves. Sized for a node
+          # that is also running Kyverno's four controllers.
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /var/cache/nginx
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui-test-web
+  namespace: ui-test
+spec:
+  type: ClusterIP
+  selector:
+    app: ui-test-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
