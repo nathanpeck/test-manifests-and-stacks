@@ -1,0 +1,18 @@
+# Values layered over the chart's own values.yaml — only what differs.
+#
+# One node, so one replica of each controller. The chart leaves these unset and
+# decides for itself, which is right on a cluster with somewhere to put the
+# extra pods; here they would compete for the same CPU, and with the chart's
+# anti-affinity they would sit Pending and read as a broken install rather than
+# as a redundancy that cannot be satisfied.
+admissionController:
+  replicas: 1
+
+backgroundController:
+  replicas: 1
+
+cleanupController:
+  replicas: 1
+
+reportsController:
+  replicas: 1
