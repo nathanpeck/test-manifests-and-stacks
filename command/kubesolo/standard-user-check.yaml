@@ -1,0 +1,19 @@
+# An empty namespace, proposed by a standard user rather than an administrator.
+#
+# It exists to prove the chain works without administrator rights: the session
+# that read this environment was minted by the add-on's own credential, and this
+# pull request is authored by the person whose agent proposed it.
+#
+# Restricted from the start, matching the other namespaces here. Nothing runs in
+# it, so there is nothing for the policy to break.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: standard-user-check
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
