@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: allowlist-probe
+  namespace: default
+data:
+  probe: "1"
