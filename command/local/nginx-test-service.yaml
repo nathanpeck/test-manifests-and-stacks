@@ -1,0 +1,20 @@
+# ClusterIP in front of the nginx-test Deployment.
+# Paired with nginx-test-deployment.yaml. Safe to remove.
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-test
+  namespace: kube-public
+  labels:
+    app.kubernetes.io/name: nginx-test
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: test-fixture
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: nginx-test
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
