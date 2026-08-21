@@ -1,0 +1,18 @@
+# /var/www/html for WordPress: uploads, plugins and themes installed through
+# the admin UI live here. Inherits the default local-path StorageClass, so it
+# is node-local and pins the pod to whichever node claims it first.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-content
+  namespace: default
+  labels:
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: frontend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
