@@ -1,0 +1,22 @@
+# Headless Service in front of the MySQL Deployment. clusterIP: None because
+# there is exactly one backend and WordPress only needs to resolve its name;
+# it also avoids a stale virtual IP holding connections open across a Recreate.
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  namespace: default
+  labels:
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: database
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/component: database
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: mysql
+      protocol: TCP
