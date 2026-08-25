@@ -1,7 +1,6 @@
-# Public entrypoint for WordPress. LoadBalancer so the site is reachable
-# without port-forwarding: this is k3s, whose built-in service load balancer
-# publishes it on the node's port 80. Switch to ClusterIP if it should not be
-# exposed outside the cluster.
+# ClusterIP entrypoint for WordPress. Traffic reaches the pod via the
+# Traefik IngressRoute defined in wordpress-ingressroute.yaml rather than
+# a cloud load balancer.
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,7 +11,7 @@ metadata:
     app.kubernetes.io/managed-by: portainer-command
     app.kubernetes.io/component: frontend
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: wordpress
     app.kubernetes.io/component: frontend

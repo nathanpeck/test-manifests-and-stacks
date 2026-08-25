@@ -16,7 +16,7 @@ metadata:
     app.kubernetes.io/managed-by: portainer-command
     app.kubernetes.io/component: frontend
 spec:
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:
