@@ -92,6 +92,7 @@ spec:
               add:
                 - SETGID
                 - SETUID
+                - CHOWN
       volumes:
         - name: data
           persistentVolumeClaim:
