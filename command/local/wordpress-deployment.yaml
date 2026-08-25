@@ -85,6 +85,9 @@ spec:
             capabilities:
               drop:
                 - ALL
+              add:
+                - SETGID
+                - CHOWN
       volumes:
         - name: content
           persistentVolumeClaim:

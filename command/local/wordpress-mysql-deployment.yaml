@@ -89,6 +89,8 @@ spec:
             capabilities:
               drop:
                 - ALL
+              add:
+                - SETGID
       volumes:
         - name: data
           persistentVolumeClaim:
