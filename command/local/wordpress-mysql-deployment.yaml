@@ -28,6 +28,8 @@ spec:
         app.kubernetes.io/managed-by: portainer-command
         app.kubernetes.io/component: database
     spec:
+      securityContext:
+        fsGroup: 999
       containers:
         - name: mysql
           image: mysql:8.0

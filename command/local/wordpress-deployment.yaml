@@ -30,6 +30,8 @@ spec:
         app.kubernetes.io/managed-by: portainer-command
         app.kubernetes.io/component: frontend
     spec:
+      securityContext:
+        fsGroup: 33
       containers:
         - name: wordpress
           image: wordpress:6.5-apache
