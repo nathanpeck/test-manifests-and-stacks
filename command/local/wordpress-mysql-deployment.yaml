@@ -91,6 +91,7 @@ spec:
                 - ALL
               add:
                 - SETGID
+                - SETUID
       volumes:
         - name: data
           persistentVolumeClaim:

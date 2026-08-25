@@ -87,6 +87,7 @@ spec:
                 - ALL
               add:
                 - SETGID
+                - SETUID
                 - CHOWN
       volumes:
         - name: content
