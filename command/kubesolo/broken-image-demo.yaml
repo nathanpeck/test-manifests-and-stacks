@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-image-demo
+  namespace: default
+  labels:
+    app: broken-image-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-image-demo
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: broken-image-demo
+    spec:
+      containers:
+      - name: broken
+        image: ghcr.io/nathanpeck/this-image-does-not-exist:v0.0.1
+        imagePullPolicy: Always
+        resources: {}
