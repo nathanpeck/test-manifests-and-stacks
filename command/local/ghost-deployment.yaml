@@ -31,12 +31,12 @@ spec:
     spec:
       initContainers:
         - name: wait-for-mysql
-          image: busybox:1.36
+          image: mysql:8.0
           command:
             - sh
             - -c
             - |
-              until nc -z ghost-mysql 3306; do
+              until mysqladmin ping -h ghost-mysql --silent; do
                 echo "waiting for mysql..."; sleep 2
               done
       containers:
