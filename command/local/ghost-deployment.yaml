@@ -29,6 +29,8 @@ spec:
         app.kubernetes.io/managed-by: portainer-command
         app.kubernetes.io/component: frontend
     spec:
+      securityContext:
+        fsGroup: 1000
       initContainers:
         - name: wait-for-mysql
           image: mysql:8.0
