@@ -1,0 +1,16 @@
+# Persistent storage for Ghost's MySQL database.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ghost-mysql-data
+  namespace: default
+  labels:
+    app.kubernetes.io/name: ghost
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
