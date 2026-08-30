@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcp-exercise
+  namespace: default
+data:
+  purpose: "MCP server end-to-end exercise 2026-08-30"
