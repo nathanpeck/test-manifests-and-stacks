@@ -1,0 +1,18 @@
+# Envoy Gateway v1.9.1 values
+# CRDs included (Gateway API + Envoy Gateway CRDs)
+crds:
+  enabled: true
+
+# Single replica is fine for this cluster
+deployment:
+  replicas: 1
+
+# Keep resource usage reasonable
+envoyGateway:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
