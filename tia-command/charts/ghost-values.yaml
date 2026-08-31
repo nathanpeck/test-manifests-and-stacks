@@ -1,0 +1,34 @@
+ghostUsername: admin
+ghostPassword: "Ch@ngeMe2024!"
+ghostEmail: admin@example.com
+ghostBlogTitle: "My Ghost Blog"
+
+# Use NodePort so it's reachable without a LoadBalancer
+service:
+  type: NodePort
+  nodePorts:
+    http: "30080"
+
+# Use local-path storage class available on this cluster
+persistence:
+  size: 2Gi
+  storageClass: local-path
+
+# Keep resource usage reasonable
+resourcesPreset: "micro"
+
+# Disable MySQL external dependency — use bundled MariaDB
+mariadb:
+  enabled: true
+  primary:
+    persistence:
+      size: 2Gi
+      storageClass: local-path
+
+# Ghost needs to know its URL to generate correct links
+ghostHost: ""
+ghostPath: /
+
+# Disable ingress (using NodePort instead)
+ingress:
+  enabled: false
