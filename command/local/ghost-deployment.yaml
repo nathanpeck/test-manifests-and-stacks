@@ -1,0 +1,106 @@
+# Ghost blog, talking to the ghost-mysql Service.
+#
+# Single replica with Recreate strategy: /var/lib/ghost/content is a
+# ReadWriteOnce volume and cannot be shared across pods.
+#
+# Ghost is configured for MySQL via DATABASE_* env vars. The URL must match
+# what Traefik advertises for the ingress host.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghost
+  namespace: default
+  labels:
+    app.kubernetes.io/name: ghost
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ghost
+      app.kubernetes.io/component: frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ghost
+        app.kubernetes.io/managed-by: portainer-command
+        app.kubernetes.io/component: frontend
+    spec:
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: wait-for-mysql
+          image: mysql:8.0
+          command:
+            - sh
+            - -c
+            - |
+              until mysqladmin ping -h ghost-mysql --silent; do
+                echo "waiting for mysql..."; sleep 2
+              done
+      containers:
+        - name: ghost
+          image: ghost:5-alpine
+          env:
+            - name: url
+              value: http://ghost.nathanpeck.gg
+            - name: database__client
+              value: mysql
+            - name: database__connection__host
+              value: ghost-mysql
+            - name: database__connection__port
+              value: "3306"
+            - name: database__connection__database
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-mysql
+                  key: mysql-database
+            - name: database__connection__user
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-mysql
+                  key: mysql-user
+            - name: database__connection__password
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-mysql
+                  key: mysql-password
+          ports:
+            - name: http
+              containerPort: 2368
+          volumeMounts:
+            - name: content
+              mountPath: /var/lib/ghost/content
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /ghost/api/admin/site/
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /ghost/api/admin/site/
+              port: http
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 6
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: content
+          persistentVolumeClaim:
+            claimName: ghost-content
