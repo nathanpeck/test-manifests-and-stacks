@@ -34,7 +34,7 @@ metadata:
     app: ghost-mariadb
 spec:
   serviceName: ghost-mariadb
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: ghost-mariadb
