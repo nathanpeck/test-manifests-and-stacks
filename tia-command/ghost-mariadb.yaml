@@ -42,6 +42,8 @@ spec:
     metadata:
       labels:
         app: ghost-mariadb
+      annotations:
+        rollout-trigger: "fix-run-mysqld-volume"
     spec:
       automountServiceAccountToken: false
       securityContext:
