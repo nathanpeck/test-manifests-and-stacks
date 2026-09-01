@@ -17,18 +17,22 @@ persistence:
 # Keep resource usage reasonable
 resourcesPreset: "micro"
 
-# Use bundled MySQL dependency
+# Disable bundled MySQL — use external MariaDB instead
 mysql:
-  enabled: true
-  primary:
-    persistence:
-      size: 2Gi
-      storageClass: local-path
+  enabled: false
+
+# Point Ghost at the MariaDB service deployed alongside it
+externalDatabase:
+  host: ghost-mariadb
+  port: 3306
+  user: ghost
+  password: "ghostdbpass"
+  database: ghost
 
 # Ghost needs to know its URL to generate correct links
 ghostHost: ""
 ghostPath: /
 
-# Disable ingress (using NodePort instead)
+# Disable ingress (using Envoy Gateway HTTPRoute instead)
 ingress:
   enabled: false
