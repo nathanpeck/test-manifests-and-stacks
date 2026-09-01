@@ -30,7 +30,9 @@ externalDatabase:
   database: ghost
 
 # Ghost needs to know its URL to generate correct links
-ghostHost: ""
+# The chart gates the entire Deployment on this being non-empty.
+# Using the node IP with the NodePort since no external LB is assigned yet.
+ghostHost: "10.10.109.168"
 ghostPath: /
 
 # Disable ingress (using Envoy Gateway HTTPRoute instead)
