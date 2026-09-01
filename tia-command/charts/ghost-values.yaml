@@ -17,8 +17,8 @@ persistence:
 # Keep resource usage reasonable
 resourcesPreset: "micro"
 
-# Disable MySQL external dependency — use bundled MariaDB
-mariadb:
+# Use bundled MySQL dependency
+mysql:
   enabled: true
   primary:
     persistence:
