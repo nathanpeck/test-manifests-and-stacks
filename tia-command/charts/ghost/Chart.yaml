@@ -10,12 +10,6 @@ annotations:
 apiVersion: v2
 appVersion: 6.0.5
 dependencies:
-- condition: mysql.enabled
-  name: mysql
-  repository: oci://registry-1.docker.io/bitnamicharts
-  tags:
-  - ghost-database
-  version: 14.x.x
 - name: common
   repository: oci://registry-1.docker.io/bitnamicharts
   tags:
