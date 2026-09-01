@@ -1,0 +1,137 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ghost-config
+  namespace: default
+type: Opaque
+stringData:
+  database__client: mysql
+  database__connection__host: ghost-mariadb
+  database__connection__port: "3306"
+  database__connection__user: ghost
+  database__connection__password: "ghostdbpass"
+  database__connection__database: ghost
+  url: "http://10.10.109.168:30080"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ghost-content
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: charts-ghost
+  namespace: default
+  labels:
+    app: ghost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghost
+  template:
+    metadata:
+      labels:
+        app: ghost
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: mariadb:11.4
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until mariadb-admin ping -h ghost-mariadb -u ghost -pghostdbpass --silent; do
+                echo "Waiting for MariaDB..."
+                sleep 3
+              done
+      containers:
+        - name: ghost
+          image: ghost:5
+          ports:
+            - containerPort: 2368
+              name: http
+          env:
+            - name: database__client
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: database__client
+            - name: database__connection__host
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: database__connection__host
+            - name: database__connection__port
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: database__connection__port
+            - name: database__connection__user
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: database__connection__user
+            - name: database__connection__password
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: database__connection__password
+            - name: database__connection__database
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: database__connection__database
+            - name: url
+              valueFrom:
+                secretKeyRef:
+                  name: ghost-config
+                  key: url
+          volumeMounts:
+            - name: content
+              mountPath: /var/lib/ghost/content
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /ghost/api/admin/site/
+              port: 2368
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: content
+          persistentVolumeClaim:
+            claimName: ghost-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: charts-ghost
+  namespace: default
+  labels:
+    app: ghost
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 2368
+      nodePort: 30080
+      name: http
+  selector:
+    app: ghost
