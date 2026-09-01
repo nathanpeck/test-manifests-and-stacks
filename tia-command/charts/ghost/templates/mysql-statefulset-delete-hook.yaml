@@ -1,0 +1,73 @@
+{{- if .Values.mysql.enabled }}
+# Pre-upgrade hook: deletes the MySQL StatefulSet before Helm upgrades the release.
+# This is required because Kubernetes forbids in-place updates to immutable StatefulSet
+# fields (such as the pod template image). Deleting the StatefulSet allows Helm to
+# recreate it with the correct image. The PVC is NOT deleted, so data is preserved.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "common.names.fullname" . }}-mysql-hook
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "common.names.fullname" . }}-mysql-hook
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+rules:
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["delete", "get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "common.names.fullname" . }}-mysql-hook
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "common.names.fullname" . }}-mysql-hook
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "common.names.fullname" . }}-mysql-hook
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "common.names.fullname" . }}-mysql-hook
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "common.names.fullname" . }}-mysql-hook
+      restartPolicy: Never
+      containers:
+        - name: delete-statefulset
+          image: bitnami/kubectl:latest
+          command:
+            - kubectl
+            - delete
+            - statefulset
+            - {{ include "common.names.fullname" . }}-mysql
+            - --namespace
+            - {{ .Release.Namespace }}
+            - --ignore-not-found
+{{- end }}
