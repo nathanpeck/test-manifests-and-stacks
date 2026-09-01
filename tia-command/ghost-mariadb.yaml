@@ -97,6 +97,8 @@ spec:
               mountPath: /var/lib/mysql
             - name: tmp
               mountPath: /tmp
+            - name: run-mysqld
+              mountPath: /run/mysqld
           resources:
             requests:
               cpu: 100m
@@ -106,6 +108,8 @@ spec:
               memory: 512Mi
       volumes:
         - name: tmp
+          emptyDir: {}
+        - name: run-mysqld
           emptyDir: {}
   volumeClaimTemplates:
     - metadata:
