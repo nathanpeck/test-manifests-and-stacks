@@ -4,6 +4,8 @@ kind: Deployment
 metadata:
   name: nginx
   namespace: default
+  labels:
+    app: nginx
 spec:
   replicas: 1
   selector:
@@ -14,21 +16,66 @@ spec:
       labels:
         app: nginx
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: nginx
-          image: nginx:latest
+          image: nginxinc/nginx-unprivileged:1.27@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
           ports:
-            - containerPort: 80
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: nginx
   namespace: default
+  labels:
+    app: nginx
 spec:
   type: ClusterIP
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 8080
+      name: http
   selector:
     app: nginx
