@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network
+  namespace: default
+  labels:
+    app: network
+    io.portainer.kubernetes.application.kind: git
+    io.portainer.kubernetes.application.name: network
+    io.portainer.kubernetes.application.owner: peckn
+    io.portainer.kubernetes.application.owner.id: "1"
+    io.portainer.kubernetes.application.stack: network
+    io.portainer.kubernetes.application.stackid: "18"
+    managed-by: portainer-run
+  annotations:
+    portainer-run/deploy-type: vibe
+    portainer-run/git-branch: main
+    portainer-run/git-path: local/default/network.yaml
+    portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
+    portainer-run/vibe-source-path: local/default/network/src
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: network
+        managed-by: portainer-run
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      schedulerName: default-scheduler
+      initContainers:
+      - name: vibe-sync
+        image: alpine/git:latest
+        imagePullPolicy: Always
+        command:
+        - sh
+        - -c
+        - git config --global http.sslVerify false && git clone --depth 1 --branch
+          main https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/nathanpeck/test-manifests-and-stacks
+          /tmp/repo && mkdir -p /usr/share/nginx/html && cp -r /tmp/repo/local/default/network/src/.
+          /usr/share/nginx/html/ && rm -rf /tmp/repo
+        env:
+        - name: GIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: network-git-credentials
+              key: username
+        - name: GIT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: network-git-credentials
+              key: token
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: app-data
+          mountPath: /usr/share/nginx/html
+      containers:
+      - name: network
+        image: nginxinc/nginx-unprivileged:alpine
+        imagePullPolicy: IfNotPresent
+        command:
+        - sh
+        - -c
+        - nginx -g 'daemon off;'
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - name: app-data
+          mountPath: /usr/share/nginx/html
+        workingDir: /usr/share/nginx/html
+      volumes:
+      - name: app-data
+        persistentVolumeClaim:
+          claimName: network-data
