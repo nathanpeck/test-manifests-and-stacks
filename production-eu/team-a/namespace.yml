@@ -4,4 +4,4 @@ metadata:
   name: team-a
   labels:
     io.portainer.idp.managed: 'true'
-    io.portainer.idp.deploy-target: '5'
+    io.portainer.idp.deploy-target: '6'
