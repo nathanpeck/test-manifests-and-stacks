@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-web
+  namespace: analytics
+  labels:
+    app: hello-web
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: production-eu/analytics/hello-web.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '6'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-web
+  template:
+    metadata:
+      labels:
+        app: hello-web
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:latest
+          imagePullPolicy: Always
