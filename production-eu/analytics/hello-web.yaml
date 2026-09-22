@@ -11,6 +11,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: production-eu/analytics/hello-web.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '23'
     portainer-idp/edge-group-ids: '6'
 spec:
   replicas: 1
