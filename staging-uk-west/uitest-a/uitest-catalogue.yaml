@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-redis-data
+  namespace: uitest-a
+  labels:
+    app: uitest-catalogue
+    managed-by: portainer-idp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-catalogue
+  namespace: uitest-a
+  labels:
+    app: uitest-catalogue
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '2'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: staging-uk-west/uitest-a/uitest-catalogue.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '7'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-catalogue
+  template:
+    metadata:
+      labels:
+        app: uitest-catalogue
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - name: redis-redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-redis-data
+          persistentVolumeClaim:
+            claimName: redis-redis-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-catalogue
+  namespace: uitest-a
+  labels:
+    app: uitest-catalogue
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-catalogue
+  type: NodePort
+  ports:
+    - name: port-6379
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
