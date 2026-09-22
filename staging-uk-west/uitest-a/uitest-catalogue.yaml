@@ -26,6 +26,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: staging-uk-west/uitest-a/uitest-catalogue.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '31'
     portainer-idp/edge-group-ids: '7'
 spec:
   replicas: 1
