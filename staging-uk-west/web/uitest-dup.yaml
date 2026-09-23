@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-dup
+  namespace: web
+  labels:
+    app: uitest-dup
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '2'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: staging-uk-west/web/uitest-dup.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '8'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-dup
+  template:
+    metadata:
+      labels:
+        app: uitest-dup
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          imagePullPolicy: Always
