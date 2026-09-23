@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-extra
+  namespace: extra
+  labels:
+    app: demo-extra
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '2'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: staging-uk-west/extra/demo-extra.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '8'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-extra
+  template:
+    metadata:
+      labels:
+        app: demo-extra
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          imagePullPolicy: Always
