@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: native-test-app
+  namespace: native-secrets-0924
+  labels:
+    app: native-test-app
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '2'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: idp-native-test/native-secrets-0924/native-test-app.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '4'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: native-test-app
+  template:
+    metadata:
+      labels:
+        app: native-test-app
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          imagePullPolicy: Always
+          env:
+            - name: APP_TEST_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: native-test-secret
+                  key: TEST_KEY
