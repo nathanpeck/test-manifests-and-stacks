@@ -15,7 +15,7 @@ metadata:
     portainer-idp/edge-stack-id: '33'
     portainer-idp/edge-group-ids: '10'
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: uitest-r2-std-handoff
