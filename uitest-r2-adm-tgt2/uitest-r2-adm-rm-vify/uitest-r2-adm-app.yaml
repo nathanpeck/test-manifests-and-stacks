@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r2-adm-app
+  namespace: uitest-r2-adm-rm-vify
+  labels:
+    app: uitest-r2-adm-app
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r2-adm-tgt2/uitest-r2-adm-rm-vify/uitest-r2-adm-app.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '12'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r2-adm-app
+  template:
+    metadata:
+      labels:
+        app: uitest-r2-adm-app
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: traefik/whoami:v1.10
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r2-adm-app
+  namespace: uitest-r2-adm-rm-vify
+  labels:
+    app: uitest-r2-adm-app
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r2-adm-app
+  type: ClusterIP
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
