@@ -29,6 +29,9 @@ spec:
         - name: nginx
           image: traefik/whoami:v1.10
           imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: uitest-r2-std-sec
           resources:
             requests:
               cpu: 50m
