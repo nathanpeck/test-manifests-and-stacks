@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r2-std-cat
+  namespace: uitest-r2-std-a-pzvn
+  labels:
+    app: uitest-r2-std-cat
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r2-std-tgt-zohu/uitest-r2-std-a-pzvn/uitest-r2-std-cat.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '13'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r2-std-cat
+  template:
+    metadata:
+      labels:
+        app: uitest-r2-std-cat
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r2-std-cat
+  namespace: uitest-r2-std-a-pzvn
+  labels:
+    app: uitest-r2-std-cat
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r2-std-cat
+  type: NodePort
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
