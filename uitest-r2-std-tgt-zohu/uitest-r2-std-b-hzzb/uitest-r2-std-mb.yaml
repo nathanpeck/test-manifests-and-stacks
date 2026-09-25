@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r2-std-mb
+  namespace: uitest-r2-std-b-hzzb
+  labels:
+    app: uitest-r2-std-mb
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r2-std-tgt-zohu/uitest-r2-std-b-hzzb/uitest-r2-std-mb.yaml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '13'
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: uitest-r2-std-mb
+  template:
+    metadata:
+      labels:
+        app: uitest-r2-std-mb
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: traefik/whoami:v1.10
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MB_REV
+              value: '1'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r2-std-mb
+  namespace: uitest-r2-std-b-hzzb
+  labels:
+    app: uitest-r2-std-mb
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r2-std-mb
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
