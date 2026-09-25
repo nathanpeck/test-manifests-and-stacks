@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r2-adm-canary
+  namespace: uitest-r2-adm-canns-kdhz
+  labels:
+    app: uitest-r2-adm-canary
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r2-adm-tgt/uitest-r2-adm-canns-kdhz/uitest-r2-adm-canary.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '10'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r2-adm-canary
+  template:
+    metadata:
+      labels:
+        app: uitest-r2-adm-canary
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: traefik/whoami:latest
+          imagePullPolicy: Always
