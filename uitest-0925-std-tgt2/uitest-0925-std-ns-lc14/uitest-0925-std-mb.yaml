@@ -12,11 +12,10 @@ metadata:
     portainer-idp/git-path: uitest-0925-std-tgt2/uitest-0925-std-ns-lc14/uitest-0925-std-mb.yaml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
-    portainer-idp/edge-stack-id: '27'
     portainer-idp/edge-group-ids: '9'
     uitest/owner: std
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: uitest-0925-std-mb
@@ -29,7 +28,7 @@ spec:
       containers:
         - name: app
           image: nginx:1.27-alpine
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command:
             - sh
             - -c
@@ -37,9 +36,6 @@ spec:
           env:
             - name: GREETING
               value: hello world
-          envFrom:
-            - secretRef:
-                name: uitest-0925-std-sec
 ---
 apiVersion: v1
 kind: Service
