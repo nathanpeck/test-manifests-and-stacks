@@ -16,7 +16,7 @@ metadata:
     portainer-idp/edge-group-ids: '9'
     uitest/owner: std
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: uitest-0925-std-mb
@@ -29,7 +29,7 @@ spec:
       containers:
         - name: app
           image: nginx:1.27-alpine
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command:
             - sh
             - -c
