@@ -11,6 +11,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-r2-adm-tgt/uitest-r2-adm-shared-xuay/uitest-r2-std-handoff.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '33'
     portainer-idp/edge-group-ids: '10'
 spec:
   replicas: 1
