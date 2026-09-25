@@ -10,11 +10,12 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-0925-std-tgt2/uitest-0925-std-ns-lc14/uitest-0925-std-handoff.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-stack-id: '25'
     portainer-idp/edge-group-ids: '9'
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: uitest-0925-std-handoff
@@ -30,4 +31,4 @@ spec:
           imagePullPolicy: Always
           env:
             - name: HANDOFF_REV
-              value: '1'
+              value: '2'
