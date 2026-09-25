@@ -37,6 +37,9 @@ spec:
           env:
             - name: GREETING
               value: hello world
+          envFrom:
+            - secretRef:
+                name: uitest-0925-std-sec
 ---
 apiVersion: v1
 kind: Service
