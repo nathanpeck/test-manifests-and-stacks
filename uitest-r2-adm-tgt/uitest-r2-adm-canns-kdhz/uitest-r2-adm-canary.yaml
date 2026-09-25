@@ -11,6 +11,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-r2-adm-tgt/uitest-r2-adm-canns-kdhz/uitest-r2-adm-canary.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '32'
     portainer-idp/edge-group-ids: '10'
 spec:
   replicas: 1
