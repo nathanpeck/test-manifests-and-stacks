@@ -10,6 +10,7 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-r2-adm-tgt/uitest-r2-adm-canns-kdhz/uitest-r2-adm-canary.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-stack-id: '32'
     portainer-idp/edge-group-ids: '10'
@@ -26,5 +27,5 @@ spec:
     spec:
       containers:
         - name: app
-          image: traefik/whoami:latest
-          imagePullPolicy: Always
+          image: traefik/whoami:v1.10
+          imagePullPolicy: IfNotPresent
