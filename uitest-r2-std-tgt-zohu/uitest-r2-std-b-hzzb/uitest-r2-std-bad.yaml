@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r2-std-bad
+  namespace: uitest-r2-std-b-hzzb
+  labels:
+    app: uitest-r2-std-bad
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r2-std-tgt-zohu/uitest-r2-std-b-hzzb/uitest-r2-std-bad.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '13'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r2-std-bad
+  template:
+    metadata:
+      labels:
+        app: uitest-r2-std-bad
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:::bad image@@
+          imagePullPolicy: Always
