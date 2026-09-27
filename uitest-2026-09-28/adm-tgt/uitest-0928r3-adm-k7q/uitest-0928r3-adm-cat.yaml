@@ -11,6 +11,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-2026-09-28/adm-tgt/uitest-0928r3-adm-k7q/uitest-0928r3-adm-cat.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '50'
     portainer-idp/edge-group-ids: '17'
 spec:
   replicas: 1
