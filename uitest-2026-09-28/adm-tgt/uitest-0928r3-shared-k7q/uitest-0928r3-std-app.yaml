@@ -10,6 +10,7 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-2026-09-28/adm-tgt/uitest-0928r3-shared-k7q/uitest-0928r3-std-app.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-stack-id: '52'
     portainer-idp/edge-group-ids: '17'
@@ -26,7 +27,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: nginx:::bad image@@
+          image: nginx:alpine
           imagePullPolicy: Always
           resources:
             requests:
