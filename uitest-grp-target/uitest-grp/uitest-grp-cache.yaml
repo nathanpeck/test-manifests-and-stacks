@@ -15,6 +15,7 @@ metadata:
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-stack-id: '79'
     portainer-idp/edge-group-ids: '25'
+    portainer-idp/note: uitest edit note
 spec:
   replicas: 1
   selector:
