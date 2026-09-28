@@ -41,6 +41,7 @@ metadata:
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-cat-sweep-0928/uitest-cat/uitest-cat-ghost.yaml
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '71'
     portainer-idp/edge-group-ids: '24'
 spec:
   replicas: 1
