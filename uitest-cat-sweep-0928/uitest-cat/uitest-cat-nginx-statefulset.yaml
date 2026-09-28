@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: uitest-cat-nginx-statefulset
+  namespace: uitest-cat
+  labels:
+    app: uitest-cat-nginx-statefulset
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '2'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-cat-sweep-0928/uitest-cat/uitest-cat-nginx-statefulset.yaml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '24'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-cat-nginx-statefulset
+  serviceName: uitest-cat-nginx-statefulset
+  template:
+    metadata:
+      labels:
+        app: uitest-cat-nginx-statefulset
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: nginx-statefulset
+          image: nginx:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: nginx-statefulset-0
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          ports:
+            - containerPort: 80
+  volumeClaimTemplates:
+    - metadata:
+        name: nginx-statefulset-0
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-statefulset
+  namespace: uitest-cat
+  labels:
+    app: uitest-cat-nginx-statefulset
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-cat-nginx-statefulset
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
