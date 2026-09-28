@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uitest-cat-ghost-ghost-data
+  namespace: uitest-cat
+  labels:
+    app: uitest-cat-ghost
+    managed-by: portainer-idp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uitest-cat-ghost-mysql-data
+  namespace: uitest-cat
+  labels:
+    app: uitest-cat-ghost
+    managed-by: portainer-idp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-cat-ghost
+  namespace: uitest-cat
+  labels:
+    app: uitest-cat-ghost
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '2'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-cat-sweep-0928/uitest-cat/uitest-cat-ghost.yaml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '24'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-cat-ghost
+  template:
+    metadata:
+      labels:
+        app: uitest-cat-ghost
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: ghost
+          image: ghost:latest
+          command:
+            - sh
+            - -c
+            - >-
+              until node -e "require('net').connect(3306, '127.0.0.1').on('connect', () => process.exit(0)).on('error',
+              () => process.exit(1))"; do echo 'waiting for mysql on 127.0.0.1:3306'; sleep 2; done; exec
+              docker-entrypoint.sh node current/index.js
+          env:
+            - name: database__client
+              value: mysql
+            - name: database__connection__host
+              value: 127.0.0.1
+            - name: database__connection__user
+              value: ghost
+            - name: database__connection__password
+              value: changeme
+            - name: database__connection__database
+              value: ghost
+          volumeMounts:
+            - name: ghost-data
+              mountPath: /var/lib/ghost/content
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          ports:
+            - containerPort: 2368
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_DATABASE
+              value: ghost
+            - name: MYSQL_USER
+              value: ghost
+            - name: MYSQL_PASSWORD
+              value: changeme
+            - name: MYSQL_RANDOM_ROOT_PASSWORD
+              value: '1'
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: ghost-data
+          persistentVolumeClaim:
+            claimName: uitest-cat-ghost-ghost-data
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: uitest-cat-ghost-mysql-data
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-cat-ghost
+  namespace: uitest-cat
+  labels:
+    app: uitest-cat-ghost
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-cat-ghost
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 2368
+      protocol: TCP
