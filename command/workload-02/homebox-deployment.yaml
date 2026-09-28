@@ -19,10 +19,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: HBOX_AUTH_API_KEY_PEPPER
-              valueFrom:
-                secretKeyRef:
-                  name: homebox-auth
-                  key: HBOX_AUTH_API_KEY_PEPPER
+              value: "W1uCt4B5dqEnjqP+wqsctxyE1K9jyO0ipt1akSK5gNonjTb/XRf6X3RMgNNZVdsL"
           volumeMounts:
             - name: homebox
               mountPath: /data
