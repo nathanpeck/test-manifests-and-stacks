@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: dev-namespace
+  labels:
+    app: redis
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: nginx
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/nginx-redis.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        managed-by: portainer-idp
+        app.kubernetes.io/part-of: nginx
+    spec:
+      containers:
+        - name: app
+          image: redis
+          imagePullPolicy: Always
+          env:
+            - name: NGINX_URL
+              value: nginx.dev-namespace.svc.cluster.local:80
