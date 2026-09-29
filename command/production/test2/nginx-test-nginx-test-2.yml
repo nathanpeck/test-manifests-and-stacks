@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test-2
+  namespace: test2
+  labels:
+    app: nginx-test-2
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: nginx-test
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: command/production/test2/nginx-test-nginx-test-2.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '16'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-test-2
+  template:
+    metadata:
+      labels:
+        app: nginx-test-2
+        managed-by: portainer-idp
+        app.kubernetes.io/part-of: nginx-test
+    spec:
+      containers:
+        - name: app
+          image: redis
+          imagePullPolicy: Always
