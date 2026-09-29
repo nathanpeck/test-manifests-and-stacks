@@ -6,11 +6,14 @@ metadata:
   labels:
     app: nginx-test
     managed-by: portainer-idp
+    app.kubernetes.io/part-of: nginx-test
   annotations:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: command/production/test2/nginx-test.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '88'
     portainer-idp/edge-group-ids: '16'
 spec:
   replicas: 1
@@ -22,6 +25,7 @@ spec:
       labels:
         app: nginx-test
         managed-by: portainer-idp
+        app.kubernetes.io/part-of: nginx-test
     spec:
       containers:
         - name: app
