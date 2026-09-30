@@ -1,1 +1,0 @@
-uitest-helm poll trigger
