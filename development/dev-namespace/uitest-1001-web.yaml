@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-1001-web
+  namespace: dev-namespace
+  labels:
+    app: uitest-1001-web
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/uitest-1001-web.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-1001-web
+  template:
+    metadata:
+      labels:
+        app: uitest-1001-web
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-1001-web
+  namespace: dev-namespace
+  labels:
+    app: uitest-1001-web
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-1001-web
+  type: ClusterIP
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
