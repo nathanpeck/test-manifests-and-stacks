@@ -2,3 +2,6 @@
 # the copy under every deploy target of the app identical.
 auth:
   existingSecret: postgres-password
+primary:
+  persistence:
+    size: 4Gi
