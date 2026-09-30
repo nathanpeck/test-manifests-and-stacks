@@ -1,5 +1,0 @@
-# Catalog defaults for this release, from the catalog item it was deployed from.
-# Rewritten when the release is upgraded; edit the catalog item instead.
-replicaCount: 1
-ui:
-  color: '#34577c'
