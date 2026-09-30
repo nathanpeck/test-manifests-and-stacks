@@ -1,7 +1,0 @@
-# Values an administrator locked for this catalog item. They are merged
-# last, so they win over the catalog defaults and your overrides.
-image:
-  repository: ghcr.io/stefanprodan/podinfo
-resources:
-  limits:
-    memory: 256Mi
