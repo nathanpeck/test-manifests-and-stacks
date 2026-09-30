@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-audit-web
+  namespace: dev-namespace
+  labels:
+    app: uitest-audit-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-audit-web
+  template:
+    metadata:
+      labels:
+        app: uitest-audit-web
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 100m
