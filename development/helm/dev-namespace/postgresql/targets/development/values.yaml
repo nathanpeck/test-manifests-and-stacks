@@ -4,4 +4,4 @@ auth:
   existingSecret: postgres-password
 primary:
   persistence:
-    size: 4Gi
+    size: 8Gi
