@@ -10,8 +10,11 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: development/dev-namespace/uitest-1001-web.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '138'
     portainer-idp/edge-group-ids: '26'
+    portainer-idp/note: uitest edit round-trip
 spec:
   replicas: 1
   selector:
@@ -27,6 +30,9 @@ spec:
         - name: app
           image: nginx:1.27-alpine
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
 ---
 apiVersion: v1
 kind: Service
