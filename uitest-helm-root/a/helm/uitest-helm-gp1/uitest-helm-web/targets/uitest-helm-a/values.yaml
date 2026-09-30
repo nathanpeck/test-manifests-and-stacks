@@ -1,5 +1,7 @@
 # Your overrides for this release. Edit them in Portainer IDP: it keeps
 # the copy under every deploy target of the app identical.
-replicaCount: 2
+replicaCount: 3
 ui:
-  message: gp v1
+  message: gp v2
+service:
+  type: NodePort
