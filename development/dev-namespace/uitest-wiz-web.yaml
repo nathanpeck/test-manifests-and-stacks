@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-wiz-web
+  namespace: dev-namespace
+  labels:
+    app: uitest-wiz-web
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/uitest-wiz-web.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-wiz-web
+  template:
+    metadata:
+      labels:
+        app: uitest-wiz-web
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-wiz-web
+  namespace: dev-namespace
+  labels:
+    app: uitest-wiz-web
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-wiz-web
+  type: NodePort
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
