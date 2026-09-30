@@ -2,7 +2,7 @@
 # the copy under every deploy target of the app identical.
 auth:
   existingSecret: postgres-password
-  database: wizdb
+  database: wizdb2
 primary:
   persistence:
     size: 1Gi
