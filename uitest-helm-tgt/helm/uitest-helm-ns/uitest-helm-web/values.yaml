@@ -1,5 +1,7 @@
 # Your overrides for this release. Edit them in Portainer IDP, which
 # rewrites chart/values.yaml in the same commit — Helm reads only that file.
-replicaCount: 1
+replicaCount: 2
 ui:
-  message: hello from uitest-helm
+  message: updated by uitest-helm
+service:
+  type: NodePort
