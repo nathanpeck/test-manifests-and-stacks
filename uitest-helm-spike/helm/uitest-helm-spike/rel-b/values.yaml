@@ -1,3 +1,0 @@
-replicaCount: 2
-podAnnotations:
-  idp-spike: "rel-b"
