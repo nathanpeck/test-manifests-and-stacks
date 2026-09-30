@@ -1,0 +1,3 @@
+# Your overrides for this release. Edit them in Portainer IDP, which
+# rewrites chart/values.yaml in the same commit — Helm reads only that file.
+replicaCount: 1
