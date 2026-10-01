@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r6-grp-b
+  namespace: dev-namespace
+  labels:
+    app: uitest-r6-grp-b
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: uitest-r6-grp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/uitest-r6-grp-uitest-r6-grp-b.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r6-grp-b
+  template:
+    metadata:
+      labels:
+        app: uitest-r6-grp-b
+        managed-by: portainer-idp
+        app.kubernetes.io/part-of: uitest-r6-grp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
