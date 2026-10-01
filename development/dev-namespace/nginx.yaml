@@ -31,3 +31,21 @@ spec:
         - name: app
           image: nginx
           imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: dev-namespace
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: my-shop
+spec:
+  selector:
+    app: nginx
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
