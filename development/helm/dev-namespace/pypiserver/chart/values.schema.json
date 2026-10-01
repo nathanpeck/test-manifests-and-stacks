@@ -1,0 +1,545 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "affinity": {
+      "additionalProperties": true,
+      "required": [],
+      "title": "affinity",
+      "type": "object"
+    },
+    "fullnameOverride": {
+      "default": "",
+      "required": [],
+      "title": "fullnameOverride",
+      "type": "string"
+    },
+    "global": {
+      "additionalProperties": true,
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "image": {
+      "additionalProperties": false,
+      "description": "This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/",
+      "properties": {
+        "pullPolicy": {
+          "default": "IfNotPresent",
+          "description": "This sets the pull policy for images.",
+          "required": [],
+          "title": "pullPolicy",
+          "type": "string",
+          "enum": ["IfNotPresent", "Never", "Always"]
+        },
+        "repository": {
+          "default": "pypiserver/pypiserver",
+          "description": "The docker image repository to use",
+          "required": [],
+          "title": "repository",
+          "type": "string"
+        },
+        "tag": {
+          "default": "",
+          "description": "Overrides the image tag whose default is the chart appVersion.",
+          "required": [],
+          "title": "tag",
+          "type": "string"
+        }
+      },
+      "required": ["repository", "pullPolicy", "tag"],
+      "title": "image",
+      "type": "object"
+    },
+    "imagePullSecrets": {
+      "description": "This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/",
+      "items": {
+        "required": []
+      },
+      "required": [],
+      "title": "imagePullSecrets",
+      "type": "array"
+    },
+    "ingress": {
+      "additionalProperties": false,
+      "description": "This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/",
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "default": {},
+          "description": "This is for setting up the ingress annotations.",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "className": {
+          "default": "",
+          "description": "This is for setting up the ingress class name.",
+          "required": [],
+          "title": "className",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "description": "This is for setting up the ingress enabled.",
+          "required": [],
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["host", "paths"],
+            "properties": {
+              "host": {
+                "type": "string"
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "pathType": {
+                      "type": "string",
+                      "enum": ["Exact", "Prefix", "ImplementationSpecific"]
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "pathType"
+                  ],
+                  "title": "paths"
+                }
+              }
+            },
+            "title": "hosts",
+            "minItems": 1
+          }
+        },
+        "tls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "secretName": {
+                "type": "string"
+              },
+              "hosts": {
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "required": [],
+                "title": "hosts",
+                "type": "array"
+              }
+            },
+            "required": [
+              "secretName",
+              "hosts"
+            ],
+            "title": "tls"
+          }
+        }
+      },
+      "required": ["enabled", "className", "annotations", "hosts", "tls"],
+      "title": "ingress",
+      "type": "object"
+    },
+    "livenessProbe": {
+      "additionalProperties": true,
+      "description": "This is to setup the liveness probe more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "properties": {
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "default": "/health",
+              "required": [],
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "default": "http",
+              "required": [],
+              "title": "port",
+              "type": "string"
+            }
+          },
+          "required": ["path", "port"],
+          "title": "httpGet",
+          "type": "object"
+        }
+      },
+      "required": ["httpGet"],
+      "title": "livenessProbe",
+      "type": "object"
+    },
+    "nameOverride": {
+      "default": "",
+      "description": "This is to override the chart name.",
+      "required": [],
+      "title": "nameOverride",
+      "type": "string"
+    },
+    "nodeSelector": {
+      "additionalProperties": true,
+      "required": [],
+      "title": "nodeSelector",
+      "type": "object"
+    },
+    "podAnnotations": {
+      "additionalProperties": true,
+      "description": "This is for setting Kubernetes Annotations to a Pod. For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
+      "required": [],
+      "title": "podAnnotations",
+      "type": "object"
+    },
+    "podArgs": {
+      "description": "PyPi server arguments. For more information checkout: https://github.com/pypiserver/pypiserver/tree/main?tab=readme-ov-file#more-details-about-pypi-server-run",
+      "items": {
+        "required": []
+      },
+      "required": [],
+      "title": "podArgs",
+      "type": "array"
+    },
+    "podLabels": {
+      "additionalProperties": true,
+      "description": "This is for setting Kubernetes Labels to a Pod. For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
+      "required": [],
+      "title": "podLabels",
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "additionalProperties": true,
+      "description": "This is for setting Security Context to a Pod. For more information checkout: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "runAsUser": {
+          "default": 1000,
+          "required": [],
+          "title": "runAsUser",
+          "type": "integer"
+        },
+        "runAsGroup": {
+          "default": 3000,
+          "required": [],
+          "title": "runAsGroup",
+          "type": "integer"
+        },
+        "fsGroup": {
+          "default": 2000,
+          "required": [],
+          "title": "fsGroup",
+          "type": "integer"
+        },
+        "supplementalGroups": {
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "runAsUser",
+          "type": "array"
+        },
+        "fsGroupChangePolicy": {
+          "default": "OnRootMismatch",
+          "required": [],
+          "title": "fsGroupChangePolicy",
+          "type": "string",
+          "enum": ["OnRootMismatch", "Always"]
+        }
+      },
+      "required": [],
+      "title": "podSecurityContext",
+      "type": "object"
+    },
+    "readinessProbe": {
+      "additionalProperties": true,
+      "description": "This is to setup the readiness probe more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+      "properties": {
+        "httpGet": {
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "default": "/health",
+              "required": [],
+              "title": "path",
+              "type": "string"
+            },
+            "port": {
+              "default": "http",
+              "required": [],
+              "title": "port",
+              "type": "string"
+            }
+          },
+          "required": ["path", "port"],
+          "title": "httpGet",
+          "type": "object"
+        }
+      },
+      "required": ["httpGet"],
+      "title": "readinessProbe",
+      "type": "object"
+    },
+    "replicaCount": {
+      "default": 1,
+      "description": "This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/",
+      "required": [],
+      "title": "replicaCount",
+      "type": "integer"
+    },
+    "resources": {
+      "additionalProperties": true,
+      "description": "This block is for setting up the resource management for the pod more information can be found here: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+      "properties": {
+        "limits": {
+          "additionalProperties": true,
+          "properties": {
+            "cpu": {
+              "default": "500m",
+              "required": [],
+              "title": "cpu",
+              "type": "string"
+            },
+            "memory": {
+              "default": "2Gi",
+              "required": [],
+              "title": "memory",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "limits",
+          "type": "object"
+        },
+        "requests": {
+          "additionalProperties": true,
+          "properties": {
+            "cpu": {
+              "default": "200m",
+              "required": [],
+              "title": "cpu",
+              "type": "string"
+            },
+            "memory": {
+              "default": "1Gi",
+              "required": [],
+              "title": "memory",
+              "type": "string"
+            }
+          },
+          "required": [],
+          "title": "requests",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "resources",
+      "type": "object"
+    },
+    "securityContext": {
+      "additionalProperties": true,
+      "description": "This is for setting Security Context to a Container. For more information checkout: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/",
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "default": false,
+          "required": [],
+          "title": "allowPrivilegeEscalation",
+          "type": "boolean"
+        },
+        "readOnlyRootFilesystem": {
+          "default": true,
+          "required": [],
+          "title": "readOnlyRootFilesystem",
+          "type": "boolean"
+        },
+        "runAsNonRoot": {
+          "default": true,
+          "required": [],
+          "title": "runAsNonRoot",
+          "type": "boolean"
+        },
+        "runAsUser": {
+          "default": 1000,
+          "required": [],
+          "title": "runAsUser",
+          "type": "integer"
+        },
+        "capabilities": {
+          "additionalProperties": true,
+          "properties": {
+            "drop": {
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "drop",
+              "type": "array"
+            },
+            "add": {
+              "items": {
+                "required": []
+              },
+              "required": [],
+              "title": "add",
+              "type": "array"
+            }
+          },
+          "required": [],
+          "title": "capabilities",
+          "type": "object"
+        }
+      },
+      "required": [],
+      "title": "securityContext",
+      "type": "object"
+    },
+    "service": {
+      "additionalProperties": false,
+      "description": "This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/",
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "description": "Additional service annotations",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "name": {
+          "default": "http",
+          "description": "Default Service name",
+          "required": [],
+          "title": "name",
+          "type": "string"
+        },
+        "port": {
+          "default": 8080,
+          "description": "This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports",
+          "required": [],
+          "title": "port",
+          "type": "integer"
+        },
+        "type": {
+          "default": "ClusterIP",
+          "description": "This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types",
+          "required": [],
+          "title": "type",
+          "type": "string"
+        }
+      },
+      "required": ["type", "port"],
+      "title": "service",
+      "type": "object"
+    },
+    "serviceAccount": {
+      "additionalProperties": false,
+      "description": "This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/",
+      "properties": {
+        "annotations": {
+          "additionalProperties": true,
+          "description": "Annotations to add to the service account",
+          "required": [],
+          "title": "annotations",
+          "type": "object"
+        },
+        "automount": {
+          "default": true,
+          "description": "Automatically mount a ServiceAccount's API credentials?",
+          "required": [],
+          "title": "automount",
+          "type": "boolean"
+        },
+        "create": {
+          "default": true,
+          "description": "Specifies whether a service account should be created",
+          "required": [],
+          "title": "create",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "description": "The name of the service account to use. If not set and create is true, a name is generated using the fullname template",
+          "required": [],
+          "title": "name",
+          "type": "string"
+        }
+      },
+      "required": ["create", "automount", "annotations", "name"],
+      "title": "serviceAccount",
+      "type": "object"
+    },
+    "strategy": {
+      "additionalProperties": true,
+      "description": "This will set the deployment strategy more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy",
+      "properties": {
+        "type": {
+          "default": "Recreate",
+          "required": [],
+          "title": "type",
+          "type": "string",
+          "enum": ["RollingUpdate", "Recreate"]
+        }
+      },
+      "required": ["type"],
+      "title": "strategy",
+      "type": "object"
+    },
+    "tolerations": {
+      "items": {
+        "required": []
+      },
+      "required": [],
+      "title": "tolerations",
+      "type": "array"
+    },
+    "volumeMounts": {
+      "description": "Additional volumeMounts on the output Deployment definition.",
+      "items": {
+        "required": []
+      },
+      "required": [],
+      "title": "volumeMounts",
+      "type": "array"
+    },
+    "volumes": {
+      "description": "Additional volumes on the output Deployment definition.",
+      "items": {
+        "required": []
+      },
+      "required": [],
+      "title": "volumes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "replicaCount",
+    "image",
+    "imagePullSecrets",
+    "nameOverride",
+    "fullnameOverride",
+    "strategy",
+    "serviceAccount",
+    "podAnnotations",
+    "podLabels",
+    "podArgs",
+    "podSecurityContext",
+    "securityContext",
+    "service",
+    "ingress",
+    "resources",
+    "livenessProbe",
+    "readinessProbe",
+    "volumes",
+    "volumeMounts",
+    "nodeSelector",
+    "tolerations",
+    "affinity"
+  ],
+  "type": "object"
+}
