@@ -1,0 +1,14 @@
+# Catalog defaults for this release, from the catalog item it was deployed from.
+# Rewritten when the release is upgraded; edit the catalog item instead.
+image:
+  repository: bitnamilegacy/postgresql
+auth:
+  database: app
+primary:
+  persistence:
+    enabled: true
+    size: 8Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
