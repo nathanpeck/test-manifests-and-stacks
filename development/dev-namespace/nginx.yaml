@@ -6,11 +6,14 @@ metadata:
   labels:
     app: nginx
     managed-by: portainer-idp
+    app.kubernetes.io/part-of: my-shop
   annotations:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: development/dev-namespace/nginx.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '143'
     portainer-idp/edge-group-ids: '26'
 spec:
   replicas: 1
@@ -22,6 +25,7 @@ spec:
       labels:
         app: nginx
         managed-by: portainer-idp
+        app.kubernetes.io/part-of: my-shop
     spec:
       containers:
         - name: app
