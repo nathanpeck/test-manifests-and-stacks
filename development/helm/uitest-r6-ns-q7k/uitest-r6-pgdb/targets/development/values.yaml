@@ -1,0 +1,7 @@
+# Your overrides for this release. Edit them in Portainer IDP: it keeps
+# the copy under every deploy target of the app identical.
+auth:
+  existingSecret: uitest-r6-pg
+primary:
+  persistence:
+    size: 1Gi
