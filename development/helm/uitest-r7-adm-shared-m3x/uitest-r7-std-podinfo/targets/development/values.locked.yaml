@@ -1,8 +1,0 @@
-# Values an administrator locked for this catalog item. They are merged
-# last, so they win over the catalog defaults and your overrides.
-redis:
-  enabled: false
-resources:
-  limits:
-    cpu: 200m
-    memory: 128Mi
