@@ -1,0 +1,7 @@
+# Catalog defaults for this release, from the catalog item it was deployed from.
+# Rewritten when the release is upgraded; edit the catalog item instead.
+replicaCount: 1
+resources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
