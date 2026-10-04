@@ -1,0 +1,23 @@
+# Values an administrator locked for this catalog item. They are merged
+# last, so they win over the catalog defaults and your overrides.
+auth:
+  enabled: true
+  aclUsers:
+    default:
+      permissions: ~* &* +@all
+      passwordKey: password
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+initResources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+dataStorage:
+  hostPath: ''
+service:
+  type: ClusterIP
