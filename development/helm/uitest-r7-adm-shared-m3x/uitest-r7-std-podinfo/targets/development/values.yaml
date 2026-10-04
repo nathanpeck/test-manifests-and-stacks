@@ -1,4 +1,5 @@
 # Your overrides for this release. Edit them in Portainer IDP: it keeps
 # the copy under every deploy target of the app identical.
+replicaCount: 2
 ui:
-  message: uitest r7 v1
+  message: uitest r7 v2
