@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r9-adm-canary-app
+  namespace: uitest-r9-adm-cns-ffv
+  labels:
+    app: uitest-r9-adm-canary-app
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r9-adm-canary-apptgt-lkt/uitest-r9-adm-cns-ffv/uitest-r9-adm-canary-app.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '40'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r9-adm-canary-app
+  template:
+    metadata:
+      labels:
+        app: uitest-r9-adm-canary-app
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 64Mi
