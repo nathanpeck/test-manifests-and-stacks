@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r9-std-smuggle
+  namespace: uitest-r9-adm-shared-kup
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: uitest-r9-std-smuggle } }
+  template:
+    metadata: { labels: { app: uitest-r9-std-smuggle } }
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          resources: { requests: { cpu: 10m, memory: 16Mi }, limits: { cpu: 50m, memory: 64Mi } }
