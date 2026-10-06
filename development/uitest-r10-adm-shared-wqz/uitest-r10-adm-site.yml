@@ -32,6 +32,7 @@ metadata:
     portainer-idp/git-path: development/uitest-r10-adm-shared-wqz/uitest-r10-adm-site.yml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '188'
     portainer-idp/edge-group-ids: '26'
 spec:
   replicas: 1
@@ -93,7 +94,7 @@ spec:
             - name: site
               mountPath: /git
               readOnly: true
-            - name: cm-static-site-nginx
+            - name: cm-uitest-r10-adm-site-nginx
               mountPath: /etc/nginx/conf.d
           resources:
             requests:
@@ -131,7 +132,7 @@ spec:
             - name: GITSYNC_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: static-site-git
+                  name: uitest-r10-adm-sec
                   key: token
                   optional: true
           volumeMounts:
@@ -147,7 +148,7 @@ spec:
       volumes:
         - name: site
           emptyDir: {}
-        - name: cm-static-site-nginx
+        - name: cm-uitest-r10-adm-site-nginx
           configMap:
             name: uitest-r10-adm-site-nginx
 ---
