@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r11-out-bind2
+  namespace: dev-namespace
+  labels:
+    app: uitest-r11-out-bind2
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/uitest-r11-out-bind2.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r11-out-bind2
+  template:
+    metadata:
+      labels:
+        app: uitest-r11-out-bind2
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: IfNotPresent
+      volumes:
+        - name: pg
+          secret:
+            secretName: postgres-password
+            optional: true
+            items:
+              - key: uitest-r11-nonexistent-key
+                path: x
