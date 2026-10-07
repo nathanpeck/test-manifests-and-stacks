@@ -10,7 +10,9 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: development/uitest-r11-adm-shared-jvb/uitest-r11-std-d2.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '207'
     portainer-idp/edge-group-ids: '26'
 spec:
   replicas: 1
@@ -25,5 +27,8 @@ spec:
     spec:
       containers:
         - name: app
-          image: nginx:1.27-alpine
+          image: nginx:1.26-alpine
           imagePullPolicy: Always
+          env:
+            - name: MOTTO
+              value: Ça va? «oui» — 日本語 \n "q"
