@@ -10,10 +10,13 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: command/production/uitest-r11-adm-prod-zkf/uitest-r11-adm-multi.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '194'
     portainer-idp/edge-group-ids: '16'
+    portainer-idp/note: stale edit r11
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: uitest-r11-adm-multi
