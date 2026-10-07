@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r11-std-grp-web
+  namespace: uitest-r11-adm-shared-jvb
+  labels:
+    app: uitest-r11-std-grp-web
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: uitest-r11-std-grp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/uitest-r11-adm-shared-jvb/uitest-r11-std-grp-uitest-r11-std-grp-web.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r11-std-grp-web
+  template:
+    metadata:
+      labels:
+        app: uitest-r11-std-grp-web
+        managed-by: portainer-idp
+        app.kubernetes.io/part-of: uitest-r11-std-grp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: GREETING
+              value: héllo 世界 "double" 'single' ✓
+            - name: YAMLISH
+              value: 'key: value'
+            - name: LISTISH
+              value: '- item'
+            - name: BOOLISH
+              value: 'yes'
+            - name: HASHY
+              value: 'a #not-a-comment'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r11-std-grp-web
+  namespace: uitest-r11-adm-shared-jvb
+  labels:
+    app: uitest-r11-std-grp-web
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: uitest-r11-std-grp
+spec:
+  selector:
+    app: uitest-r11-std-grp-web
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
