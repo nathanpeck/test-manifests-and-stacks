@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: uitest-r11-std-pg
+  namespace: uitest-r11-adm-shared-jvb
+  labels:
+    app: uitest-r11-std-pg
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/uitest-r11-adm-shared-jvb/uitest-r11-std-pg.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r11-std-pg
+  serviceName: uitest-r11-std-pg
+  template:
+    metadata:
+      labels:
+        app: uitest-r11-std-pg
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: postgresql
+          image: postgres:18-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: app
+            - name: POSTGRES_USER
+              value: app
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: uitest-r11-std-pg-auth
+                  key: password
+            - name: PGDATA
+              value: /var/lib/postgresql/18/docker
+          volumeMounts:
+            - name: postgresql-data
+              mountPath: /var/lib/postgresql
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Delete
+    whenScaled: Retain
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r11-std-pg
+  namespace: uitest-r11-adm-shared-jvb
+  labels:
+    app: uitest-r11-std-pg
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r11-std-pg
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
