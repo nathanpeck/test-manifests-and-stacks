@@ -13,6 +13,7 @@ metadata:
     portainer-idp/git-path: development/uitest-r11-adm-shared-jvb/uitest-r11-std-grp-uitest-r11-std-grp-wkr.yml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '205'
     portainer-idp/edge-group-ids: '26'
 spec:
   replicas: 1
@@ -28,7 +29,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: busybox:1.36
+          image: busybox:1.37
           imagePullPolicy: Always
           command:
             - sh

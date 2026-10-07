@@ -13,6 +13,7 @@ metadata:
     portainer-idp/git-path: development/uitest-r11-adm-shared-jvb/uitest-r11-std-grp-uitest-r11-std-grp-web.yml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '204'
     portainer-idp/edge-group-ids: '26'
 spec:
   replicas: 1
@@ -36,7 +37,7 @@ spec:
             - name: GREETING
               value: héllo 世界 "double" 'single' ✓
             - name: YAMLISH
-              value: 'key: value'
+              value: 'nested: {a: 1}'
             - name: LISTISH
               value: '- item'
             - name: BOOLISH
