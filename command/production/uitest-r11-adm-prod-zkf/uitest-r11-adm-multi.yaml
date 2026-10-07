@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r11-adm-multi
+  namespace: uitest-r11-adm-prod-zkf
+  labels:
+    app: uitest-r11-adm-multi
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: command/production/uitest-r11-adm-prod-zkf/uitest-r11-adm-multi.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '16'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r11-adm-multi
+  template:
+    metadata:
+      labels:
+        app: uitest-r11-adm-multi
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
+          env:
+            - name: GREETING
+              value: 'key: héllo "wörld" - item # 日本 ''x'' {a}'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r11-adm-multi
+  namespace: uitest-r11-adm-prod-zkf
+  labels:
+    app: uitest-r11-adm-multi
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r11-adm-multi
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: uitest-r11-adm-multi
+  namespace: uitest-r11-adm-prod-zkf
+  labels:
+    app: uitest-r11-adm-multi
+    managed-by: portainer-idp
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: uitest-r11-adm-multi
+                port:
+                  number: 80
