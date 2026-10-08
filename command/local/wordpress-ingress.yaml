@@ -1,0 +1,27 @@
+# Traefik Ingress for WordPress, consistent with how cozy and network are
+# exposed on this cluster. Traffic arrives at Traefik on port 80 and is
+# forwarded to the wordpress ClusterIP Service.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress
+  namespace: default
+  labels:
+    app.kubernetes.io/name: wordpress
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: frontend
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: wordpress.nathanpeck.gg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wordpress
+                port:
+                  name: http
