@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: storefront-web
-          image: nginxinc/nginx-unprivileged:1.27.3-alpine
+          image: nginxinc/nginx-unprivileged:1.27-alpine
           ports:
             - containerPort: 8080
 ---
