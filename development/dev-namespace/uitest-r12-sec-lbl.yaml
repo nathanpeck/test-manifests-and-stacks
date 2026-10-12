@@ -12,7 +12,7 @@ metadata:
     portainer-idp/git-path: development/dev-namespace/uitest-r12-sec-lbl.yaml
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-group-ids: '26'
-    uitest-r12-step: a
+    uitest-r12-step: b
 spec:
   replicas: 1
   selector:
