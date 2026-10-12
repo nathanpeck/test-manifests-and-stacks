@@ -30,9 +30,10 @@ metadata:
   name: storefront-web
   namespace: storefront
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: storefront-web
   ports:
     - port: 80
       targetPort: 8080
+      nodePort: 30080
