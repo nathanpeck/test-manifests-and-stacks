@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r12-fix-web1
+  namespace: uitest-r12-fix-ns-jqj
+  labels:
+    app: uitest-r12-fix-web1
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r12-fix-tgta-bjk/uitest-r12-fix-ns-jqj/uitest-r12-fix-web1.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '44'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r12-fix-web1
+  template:
+    metadata:
+      labels:
+        app: uitest-r12-fix-web1
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r12-fix-web1
+  namespace: uitest-r12-fix-ns-jqj
+  labels:
+    app: uitest-r12-fix-web1
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r12-fix-web1
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: uitest-r12-fix-web1
+  namespace: uitest-r12-fix-ns-jqj
+  labels:
+    app: uitest-r12-fix-web1
+    managed-by: portainer-idp
+spec:
+  rules:
+    - host: uitest-r12-fix-vot.nathanpeck.gg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: uitest-r12-fix-web1
+                port:
+                  number: 80
