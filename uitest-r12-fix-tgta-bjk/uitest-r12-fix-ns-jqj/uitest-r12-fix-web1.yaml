@@ -13,7 +13,7 @@ metadata:
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-group-ids: '44'
 spec:
-  replicas: 3
+  replicas: 0
   selector:
     matchLabels:
       app: uitest-r12-fix-web1
