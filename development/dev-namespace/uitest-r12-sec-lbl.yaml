@@ -14,7 +14,7 @@ metadata:
     portainer-idp/edge-group-ids: '26'
     uitest-r12-step: b
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: uitest-r12-sec-lbl
