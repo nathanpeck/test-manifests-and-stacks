@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r13-ui-grp-a
+  namespace: uitest-r13-ui-ns-row
+  labels:
+    app: uitest-r13-ui-grp-a
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: uitest-r13-ui-grp-a
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r13-ui-tgt-hxa/uitest-r13-ui-ns-row/uitest-r13-ui-grp-a-uitest-r13-ui-grp-a.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '47'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r13-ui-grp-a
+  template:
+    metadata:
+      labels:
+        app: uitest-r13-ui-grp-a
+        managed-by: portainer-idp
+        app.kubernetes.io/part-of: uitest-r13-ui-grp-a
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
