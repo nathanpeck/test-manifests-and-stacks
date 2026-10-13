@@ -18,7 +18,6 @@ metadata:
     portainer-run/git-path: local/default/cozy.yaml
     portainer-run/git-target-id: 7d4607c1-0b09-4608-95b0-26dc38911887
     portainer-run/vibe-source-path: local/default/cozy/src
-    command.portainer.io/poc: run-app
 spec:
   replicas: 1
   selector:
