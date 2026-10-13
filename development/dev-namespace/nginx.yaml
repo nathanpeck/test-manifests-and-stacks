@@ -15,6 +15,7 @@ metadata:
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-stack-id: '143'
     portainer-idp/edge-group-ids: '26'
+    command.portainer.io/poc: existing-stack-sources
 spec:
   replicas: 1
   selector:
