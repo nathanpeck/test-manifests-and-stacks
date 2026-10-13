@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r14-ui-outweb
+  namespace: uitest-r14-ui-ns-yje
+  labels:
+    app: uitest-r14-ui-outweb
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r14-ui-tgt-hpq/uitest-r14-ui-ns-yje/uitest-r14-ui-outweb.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '50'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r14-ui-outweb
+  template:
+    metadata:
+      labels:
+        app: uitest-r14-ui-outweb
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1-alpine
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r14-ui-outweb
+  namespace: uitest-r14-ui-ns-yje
+  labels:
+    app: uitest-r14-ui-outweb
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r14-ui-outweb
+  type: NodePort
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
