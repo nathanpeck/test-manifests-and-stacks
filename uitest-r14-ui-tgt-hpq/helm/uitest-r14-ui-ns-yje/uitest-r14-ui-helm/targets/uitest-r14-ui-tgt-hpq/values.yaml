@@ -2,4 +2,4 @@
 # the copy under every deploy target of the app identical.
 replicaCount: 1
 ui:
-  message: r14 v2
+  message: r14 v3
