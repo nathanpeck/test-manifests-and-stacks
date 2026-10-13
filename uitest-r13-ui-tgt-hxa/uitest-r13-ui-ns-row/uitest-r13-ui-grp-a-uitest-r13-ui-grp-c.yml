@@ -13,7 +13,9 @@ metadata:
     portainer-idp/git-path: uitest-r13-ui-tgt-hxa/uitest-r13-ui-ns-row/uitest-r13-ui-grp-a-uitest-r13-ui-grp-c.yml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '287'
     portainer-idp/edge-group-ids: '47'
+    portainer-idp/note: r13 group edit
 spec:
   replicas: 1
   selector:
