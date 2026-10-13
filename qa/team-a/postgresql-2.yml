@@ -13,6 +13,7 @@ metadata:
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
     portainer-idp/edge-group-ids: '27'
+    command.portainer.io/poc: idp-app
 spec:
   replicas: 1
   selector:
