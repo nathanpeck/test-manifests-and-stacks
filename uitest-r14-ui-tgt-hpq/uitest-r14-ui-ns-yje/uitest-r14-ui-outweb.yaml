@@ -10,7 +10,9 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-r14-ui-tgt-hpq/uitest-r14-ui-ns-yje/uitest-r14-ui-outweb.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '328'
     portainer-idp/edge-group-ids: '50'
 spec:
   replicas: 1
@@ -25,7 +27,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:1-alpine
+          image: nginx:1.27-alpine
           imagePullPolicy: Always
           resources:
             requests:
