@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.25.5
+        image: docker.io/library/nginx:1.25.5@sha256:a484819eb60211f5299034ac80f6a681b06f89e65866ce91f356ed7c72af059c
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
         readinessProbe:
