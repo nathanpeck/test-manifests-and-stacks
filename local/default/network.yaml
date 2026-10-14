@@ -33,6 +33,7 @@ metadata:
     portainer-run/git-branch: main
     portainer-run/git-path: local/default/network.yaml
     portainer-run/vibe-source-path: local/default/network/src
+    command.portainer.io/poc: reattach
 spec:
   replicas: 1
   selector:
