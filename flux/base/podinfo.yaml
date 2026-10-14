@@ -9,7 +9,7 @@ metadata:
   name: podinfo-config
   namespace: poc-flux
 data:
-  message: hello from flux base
+  message: hello from a Command proposal via Flux
 ---
 apiVersion: apps/v1
 kind: Deployment
