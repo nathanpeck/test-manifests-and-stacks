@@ -4,7 +4,7 @@ metadata:
   name: argo-config
   namespace: poc-argo
 data:
-  message: hello from argo
+  message: hello from a Command proposal via Argo CD
 ---
 apiVersion: apps/v1
 kind: Deployment
