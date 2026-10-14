@@ -1,9 +1,0 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: podinfo
-  namespace: poc-flux
-  annotations:
-    env: us-east-2
-spec:
-  replicas: 1
