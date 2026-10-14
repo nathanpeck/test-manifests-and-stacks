@@ -15,10 +15,20 @@ spec:
       labels:
         app.kubernetes.io/name: homebox
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: homebox
           image: ghcr.io/sysadminsmedia/homebox:latest
           imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           env:
             - name: HBOX_AUTH_API_KEY_PEPPER
               valueFrom:
@@ -35,7 +45,11 @@ spec:
           volumeMounts:
             - name: homebox
               mountPath: /data
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: homebox
           persistentVolumeClaim:
             claimName: homebox
+        - name: tmp
+          emptyDir: {}
