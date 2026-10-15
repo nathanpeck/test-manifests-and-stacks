@@ -32,6 +32,9 @@ spec:
         - name: app
           image: nginx
           imagePullPolicy: Always
+          env:
+            - name: RETEST
+              value: "2026-10-15"
 ---
 apiVersion: v1
 kind: Service
