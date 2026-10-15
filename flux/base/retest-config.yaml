@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: retest-flux
+  namespace: default
+data:
+  retest: "2026-10-15"
