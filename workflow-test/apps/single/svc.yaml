@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: single-web
+  namespace: wft-single
+spec:
+  selector: {app: single-web}
+  ports:
+  - port: 80
