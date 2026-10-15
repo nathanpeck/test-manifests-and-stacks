@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: retest-legacy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: retest-legacy}
+  template:
+    metadata:
+      labels: {app: retest-legacy}
+    spec:
+      containers:
+        - name: web
+          image: nginxinc/nginx-unprivileged:1.27.3-alpine
