@@ -9,6 +9,7 @@ metadata:
   name: storefront-web
   namespace: storefront
   annotations:
+    command.portainer.io/retest: "2026-10-15"
     command.portainer.io/poc: existing-stack-sources
 spec:
   replicas: 2
