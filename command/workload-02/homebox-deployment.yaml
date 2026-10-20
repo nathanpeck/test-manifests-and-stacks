@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: homebox
-          image: ghcr.io/sysadminsmedia/homebox:latest
+          image: ghcr.io/sysadminsmedia/homebox@sha256:b1ad7e3c63f732a5f6daa466e8116be4f545b3b120383a64dcb62beb00a660cc
           imagePullPolicy: Always
           env:
             - name: HBOX_AUTH_API_KEY_PEPPER
