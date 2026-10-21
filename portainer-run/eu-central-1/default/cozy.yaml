@@ -46,7 +46,7 @@ spec:
         app: cozy
         managed-by: portainer-run
       annotations:
-        portainer-run/redeployed-at: '2026-10-21T22:55:38.825Z'
+        portainer-run/redeployed-at: '2026-10-21T23:10:19.054Z'
     spec:
       securityContext:
         seccompProfile:
