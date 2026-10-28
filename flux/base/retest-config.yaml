@@ -3,5 +3,7 @@ kind: ConfigMap
 metadata:
   name: retest-flux
   namespace: default
+  labels:
+    test.portainer.io/target: f
 data:
   retest: "2026-10-15"
