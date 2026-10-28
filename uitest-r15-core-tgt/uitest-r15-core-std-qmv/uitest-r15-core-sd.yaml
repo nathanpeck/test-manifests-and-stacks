@@ -15,7 +15,7 @@ metadata:
     portainer-idp/edge-stack-id: '351'
     portainer-idp/edge-group-ids: '54'
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: uitest-r15-core-sd
