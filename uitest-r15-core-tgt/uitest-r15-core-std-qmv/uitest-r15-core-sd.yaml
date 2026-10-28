@@ -10,7 +10,9 @@ metadata:
     portainer-idp/git-target-id: '1'
     portainer-idp/git-branch: main
     portainer-idp/git-path: uitest-r15-core-tgt/uitest-r15-core-std-qmv/uitest-r15-core-sd.yaml
+    portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '351'
     portainer-idp/edge-group-ids: '54'
 spec:
   replicas: 1
@@ -27,10 +29,10 @@ spec:
         - name: app
           image: nginx:1.27-alpine
           imagePullPolicy: Always
+          env:
+            - name: GREETING
+              value: hello-r15-v2
           resources:
             requests:
               cpu: 50m
               memory: 64Mi
-          env:
-            - name: GREETING
-              value: hello-r15
