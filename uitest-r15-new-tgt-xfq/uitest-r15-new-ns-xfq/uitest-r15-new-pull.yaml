@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r15-new-pull
+  namespace: uitest-r15-new-ns-xfq
+  labels:
+    app: uitest-r15-new-pull
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r15-new-tgt-xfq/uitest-r15-new-ns-xfq/uitest-r15-new-pull.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '55'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r15-new-pull
+  template:
+    metadata:
+      labels:
+        app: uitest-r15-new-pull
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/nathanpeck/uitest-r15-new-private:1
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: uitest-r15-new-pull-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r15-new-pull
+  namespace: uitest-r15-new-ns-xfq
+  labels:
+    app: uitest-r15-new-pull
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: uitest-r15-new-pull
+  type: NodePort
+  ports:
+    - name: port-80
+      port: 80
+      targetPort: 80
+      protocol: TCP
