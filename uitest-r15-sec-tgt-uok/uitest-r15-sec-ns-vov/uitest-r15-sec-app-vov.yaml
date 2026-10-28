@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r15-sec-app-vov
+  namespace: uitest-r15-sec-ns-vov
+  labels:
+    app: uitest-r15-sec-app-vov
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r15-sec-app-vov
+  template:
+    metadata:
+      labels:
+        app: uitest-r15-sec-app-vov
+    spec:
+      containers:
+        - name: uitest-r15-sec-app-vov
+          image: nginx:1.27-alpine
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 100m
