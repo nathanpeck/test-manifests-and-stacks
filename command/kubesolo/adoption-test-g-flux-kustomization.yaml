@@ -1,0 +1,14 @@
+# Adopted by Portainer-Command exactly as it ran in the cluster, before Command managed it.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: poc-flux
+    namespace: flux-system
+spec:
+    force: false
+    interval: 1m
+    path: ./flux/us-east-2
+    prune: true
+    sourceRef:
+        kind: GitRepository
+        name: test-manifests
