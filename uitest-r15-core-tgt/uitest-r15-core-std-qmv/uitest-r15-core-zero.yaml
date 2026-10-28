@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r15-core-zero
+  namespace: uitest-r15-core-std-qmv
+  labels:
+    app: uitest-r15-core-zero
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r15-core-tgt/uitest-r15-core-std-qmv/uitest-r15-core-zero.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '54'
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: uitest-r15-core-zero
+  template:
+    metadata:
+      labels:
+        app: uitest-r15-core-zero
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          env:
+            - name: GREETING
+              value: hello-r15
