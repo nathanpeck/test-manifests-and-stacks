@@ -1,0 +1,19 @@
+# Adopted by Portainer-Command exactly as it ran in the cluster, before Command managed it.
+apiVersion: v1
+kind: Service
+metadata:
+    name: web-headless
+    namespace: pr290-adopt
+spec:
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+        - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 80
+    selector:
+        app: web
+    sessionAffinity: None
+    type: ClusterIP
