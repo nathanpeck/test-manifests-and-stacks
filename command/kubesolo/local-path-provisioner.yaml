@@ -4,8 +4,6 @@ kind: Deployment
 metadata:
     name: local-path-provisioner
     namespace: local-path-storage
-    labels:
-        test.portainer.io/target: h
 spec:
     progressDeadlineSeconds: 600
     replicas: 1
