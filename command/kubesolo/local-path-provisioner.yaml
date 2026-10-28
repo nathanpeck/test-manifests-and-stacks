@@ -40,7 +40,6 @@ spec:
                   name: local-path-provisioner
                   resources:
                     limits:
-                        cpu: 200m
                         memory: 128Mi
                     requests:
                         cpu: 50m
