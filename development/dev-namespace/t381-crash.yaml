@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: t381-crash
+  namespace: dev-namespace
+  labels:
+    app: t381-crash
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/t381-crash.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: t381-crash
+  template:
+    metadata:
+      labels:
+        app: t381-crash
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          imagePullPolicy: Always
