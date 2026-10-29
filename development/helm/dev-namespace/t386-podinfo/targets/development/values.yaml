@@ -1,4 +1,4 @@
 # Your overrides for this release. Edit them in Portainer IDP: it keeps
 # the copy under every deploy target of the app identical.
 ui:
-  message: t386 rev 7
+  message: t386 rev 8
