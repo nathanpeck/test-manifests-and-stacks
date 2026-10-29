@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: t384-grp-a
+  namespace: dev-namespace
+  labels:
+    app: t384-grp-a
+    managed-by: portainer-idp
+    app.kubernetes.io/part-of: t384-grp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/t384-grp-t384-grp-a.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: t384-grp-a
+  template:
+    metadata:
+      labels:
+        app: t384-grp-a
+        managed-by: portainer-idp
+        app.kubernetes.io/part-of: t384-grp
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          imagePullPolicy: Always
