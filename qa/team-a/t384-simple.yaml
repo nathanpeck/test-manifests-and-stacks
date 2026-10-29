@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: t384-simple
+  namespace: team-a
+  labels:
+    app: t384-simple
+    managed-by: portainer-idp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: t384-simple
+  template:
+    metadata:
+      labels:
+        app: t384-simple
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          imagePullPolicy: Always
