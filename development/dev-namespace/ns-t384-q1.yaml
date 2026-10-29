@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ns-t384-q1
+  namespace: dev-namespace
+  labels:
+    app: ns-t384-q1
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: development/dev-namespace/ns-t384-q1.yaml
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '26'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ns-t384-q1
+  template:
+    metadata:
+      labels:
+        app: ns-t384-q1
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:alpine
+          imagePullPolicy: Always
