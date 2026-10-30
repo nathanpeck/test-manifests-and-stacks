@@ -21,8 +21,6 @@ spec:
       labels:
         app: uitest-prd48-app
     spec:
-      imagePullSecrets:
-        - name: uitest-prd48-dockerhub
       containers:
         - name: web
           # PRD-48 decoy: released by the release API in this test
