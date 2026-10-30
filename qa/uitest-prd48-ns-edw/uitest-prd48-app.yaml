@@ -26,7 +26,7 @@ spec:
       containers:
         - name: web
           # PRD-48 decoy: released by the release API in this test
-          image: nginx:0.0.0-uitest-prd48-missing
+          image: nginx:1.27.5-alpine
           ports:
             - containerPort: 80
           resources:
