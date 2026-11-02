@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test
+  namespace: uitest-r16-adm-shared-q7x
+  labels:
+    app: nginx-test
+    managed-by: portainer-idp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-test
+  template:
+    metadata:
+      labels:
+        app: nginx-test
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx
+          imagePullPolicy: Always
