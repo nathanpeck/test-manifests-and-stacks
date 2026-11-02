@@ -27,3 +27,12 @@ spec:
         - name: app
           image: nginx:1.27-alpine
           imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uitest-r16-adm-clash
+  namespace: uitest-r16-adm-shared-q7x
+spec:
+  ports: [{port: 80}]
+  selector: {app: uitest-r16-adm-clash}
