@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uitest-r16-std-mb
+  namespace: uitest-r16-adm-shared-q7x
+  labels:
+    app: uitest-r16-std-mb
+    managed-by: portainer-idp
+  annotations:
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-branch: main
+    portainer-idp/git-path: uitest-r16-adm-tgt/uitest-r16-adm-shared-q7x/uitest-r16-std-mb.yml
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-group-ids: '58'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uitest-r16-std-mb
+  template:
+    metadata:
+      labels:
+        app: uitest-r16-std-mb
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
