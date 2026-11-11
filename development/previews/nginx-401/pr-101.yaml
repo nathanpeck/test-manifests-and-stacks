@@ -1,0 +1,40 @@
+# Preview of nginx for pull request #101, written by Portainer IDP.
+# Generated from the application's manifest on every push: edits here are overwritten.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-pr-101
+  labels:
+    portainer-idp/preview-of: nginx
+    portainer-idp/pr: '101'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: nginx-pr-101
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+    portainer-idp/preview-of: nginx
+    portainer-idp/pr: '101'
+  annotations:
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-path: development/previews/nginx-401/pr-101.yaml
+    portainer-idp/git-branch: main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27-alpine
+          imagePullPolicy: Always
