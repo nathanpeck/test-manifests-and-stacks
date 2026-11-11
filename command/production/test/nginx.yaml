@@ -12,6 +12,7 @@ metadata:
     portainer-idp/git-path: command/production/test/nginx.yaml
     portainer-idp/deploy-type: manifest-builder
     portainer-idp/edge-stack: 'true'
+    portainer-idp/edge-stack-id: '401'
     portainer-idp/edge-group-ids: '16'
 spec:
   replicas: 1
@@ -28,3 +29,22 @@ spec:
         - name: app
           image: nginx
           imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: test
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+spec:
+  selector:
+    app: nginx
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
