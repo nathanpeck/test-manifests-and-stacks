@@ -1,0 +1,16 @@
+# A test fixture for exercising the propose -> approve -> deploy path.
+# Safe to delete: nothing reads this ConfigMap.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: approval-flow-test
+  namespace: kube-public
+  labels:
+    app.kubernetes.io/name: approval-flow-test
+    app.kubernetes.io/managed-by: portainer-command
+    app.kubernetes.io/component: test-fixture
+data:
+  purpose: |
+    Created by a Portainer Command proposal to test the approval flow.
+    No workload consumes this value.
+  createdFor: approvals-ui-testing
