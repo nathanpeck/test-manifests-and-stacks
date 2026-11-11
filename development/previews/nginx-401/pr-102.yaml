@@ -1,0 +1,83 @@
+# Preview of nginx for pull request #102, written by Portainer IDP.
+# Generated from the application's manifest on every push: edits here are overwritten.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-pr-102
+  labels:
+    portainer-idp/preview-of: nginx
+    portainer-idp/pr: '102'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: nginx-pr-102
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+    portainer-idp/preview-of: nginx
+    portainer-idp/pr: '102'
+  annotations:
+    portainer-idp/deploy-type: manifest-builder
+    portainer-idp/git-target-id: '1'
+    portainer-idp/git-path: development/previews/nginx-401/pr-102.yaml
+    portainer-idp/git-branch: main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+        managed-by: portainer-idp
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: nginx-pr-102
+  labels:
+    app: nginx
+    managed-by: portainer-idp
+    portainer-idp/preview-of: nginx
+    portainer-idp/pr: '102'
+spec:
+  selector:
+    app: nginx
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  namespace: nginx-pr-102
+  labels:
+    portainer-idp/preview-of: nginx
+    portainer-idp/pr: '102'
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: nginx-pr-102.nathanpeck.gg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
