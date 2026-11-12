@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uitest-1-1-probe
+  namespace: test
+data:
+  purpose: "uitest-1-1 acceptance test, safe to delete"
